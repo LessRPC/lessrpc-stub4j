@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<conf>
+	<nameserver>
+		<property>
+			<name>URL</name>
+			<value>localhost</value>
+		</property>
+		<property>
+			<name>PORT</name>
+			<value>6161</value>
+		</property>		
+		
+	</nameserver>	
+</conf>	
