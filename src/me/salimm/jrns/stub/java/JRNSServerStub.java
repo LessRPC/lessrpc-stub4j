@@ -1,19 +1,22 @@
 package me.salimm.jrns.stub.java;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.eclipse.jetty.server.Server;
 
+import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import com.googlecode.jsonrpc4j.JsonRpcServer;
 import com.googlecode.jsonrpc4j.ProxyUtil;
 
+import me.salimm.jrns.common.info.NameServerInfo;
 import me.salimm.jrns.common.info.ServiceInfo;
+import me.salimm.jrns.common.services.JRNSProvider;
 import me.salimm.jrns.common.services.JRNSProviderService;
+import me.salimm.jrns.common.services.NSService;
 
-public class JRNSServerStub {
+public class JRNSServerStub extends JRNSSTub {
 
-	/**
-	 * service that is supported by the instance
-	 */
-	private final ServiceInfo<?> service;
 	/**
 	 * port number that the server will be listening to
 	 */
@@ -21,12 +24,15 @@ public class JRNSServerStub {
 	/**
 	 * pointer to provider
 	 */
-	private final JRNSProviderService provider;
+	private JRNSProvider<?> provider;
 
-	public JRNSServerStub(ServiceInfo<?> service, int port, JRNSProviderService provider) {
-		this.service = service;
+	public JRNSServerStub(int port) {
 		this.port = port;
+	}
+
+	public void init(JRNSProvider<?> provider) {
 		this.provider = provider;
+
 	}
 
 	public void start() throws Exception {
@@ -42,6 +48,14 @@ public class JRNSServerStub {
 
 	}
 
+	public boolean register(NameServerInfo ns) throws MalformedURLException, Throwable {
+		JsonRpcHttpClient client = new JsonRpcHttpClient(new URL(
+				RPC_PROTOCOL + ns.getAddress() + ":" + ns.getPort() + "/" + NSService.class.getSimpleName() + ".json"));
+		Boolean registered = client.invoke("registerServiceProvider",
+				new Object[] { provider.getServiceInfo(), provider.getInfo() }, Boolean.class);
+		return registered;
+	}
+
 	private Object getCompositeService() throws Exception {
 
 		// creating the compose service
@@ -51,10 +65,10 @@ public class JRNSServerStub {
 	}
 
 	public ServiceInfo<?> getService() {
-		return service;
+		return provider.getServiceInfo();
 	}
 
-	public JRNSProviderService getProvider() {
+	public JRNSProvider<?> getProvider() {
 		return provider;
 	}
 
