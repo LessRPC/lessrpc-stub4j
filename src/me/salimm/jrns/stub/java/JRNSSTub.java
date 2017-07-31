@@ -14,15 +14,14 @@ public class JRNSSTub implements StubConstants {
 	}
 
 	public ServiceInfo<Integer> getServiceInfo(NameServerInfo info, int id) throws Throwable {
-		JsonRpcHttpClient client = new JsonRpcHttpClient(
-				new URL(RPC_PROTOCOL+info.getAddress() + ":" + info.getPort() + "/" + NSService.class.getSimpleName() + ".json"));
-		return client.invoke("getServiceInfo", id, ServiceInfo.class);
+		JsonRpcHttpClient client = new JsonRpcHttpClient(new URL(RPC_PROTOCOL + info.getAddress() + ":" + info.getPort()
+				+ "/" + NSService.class.getSimpleName() + ".json"));
+		return client.invoke("getServiceInfoById", id, ServiceInfo.class);
 	}
-	
 
 	public ServiceInfo<Integer> getServiceInfo(NameServerInfo info, String name) throws Throwable {
-		JsonRpcHttpClient client = new JsonRpcHttpClient(
-				new URL(RPC_PROTOCOL+info.getAddress() + ":" + info.getPort() + "/" + NSService.class.getSimpleName() + ".json"));
-		return client.invoke("getServiceInfo", new Object[]{name}, ServiceInfo.class);
+		JsonRpcHttpClient client = new JsonRpcHttpClient(new URL(RPC_PROTOCOL + info.getAddress() + ":" + info.getPort()
+				+ "/" + NSService.class.getSimpleName() + ".json"));
+		return client.invoke("getServiceInfoByName", new Object[] { name }, ServiceInfo.class);
 	}
 }

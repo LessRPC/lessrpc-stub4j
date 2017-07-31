@@ -51,6 +51,7 @@ public class JRNSServerStub extends JRNSSTub {
 	public boolean register(NameServerInfo ns) throws MalformedURLException, Throwable {
 		JsonRpcHttpClient client = new JsonRpcHttpClient(new URL(
 				RPC_PROTOCOL + ns.getAddress() + ":" + ns.getPort() + "/" + NSService.class.getSimpleName() + ".json"));
+		System.out.println(provider.getServiceInfo());
 		Boolean registered = client.invoke("registerServiceProvider",
 				new Object[] { provider.getServiceInfo(), provider.getInfo() }, Boolean.class);
 		return registered;
