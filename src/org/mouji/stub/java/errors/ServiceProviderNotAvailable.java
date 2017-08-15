@@ -1,6 +1,6 @@
-package me.salimm.jrns.stub.java.errors;
+package org.mouji.stub.java.errors;
 
-import me.salimm.jrns.common.info.ServiceInfo;
+import org.mouji.common.info.ServiceInfo;
 
 public class ServiceProviderNotAvailable extends Exception {
 
