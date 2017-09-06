@@ -186,7 +186,6 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleExecute(String target, Request baseRequest, HttpServletRequest request,
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws Exception {

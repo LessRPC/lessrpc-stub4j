@@ -41,8 +41,8 @@ public class ServerStub extends BasicStub {
 		}
 
 		// server started
-//		QueuedThreadPool threadPool = new QueuedThreadPool();
-//		threadPool.setMaxThreads(20);
+		// QueuedThreadPool threadPool = new QueuedThreadPool();
+		// threadPool.setMaxThreads(20);
 		server = new Server();
 
 		ServerConnector http = new ServerConnector(server);
@@ -68,7 +68,7 @@ public class ServerStub extends BasicStub {
 		});
 
 		serverThread.start();
-//		serverThread.join();
+		// serverThread.join();
 
 	}
 

@@ -59,8 +59,8 @@ public class JsonSerializerTest {
 	@Test
 	public void testSupportResponse() {
 
-		ServiceSupportResponse response = new ServiceSupportResponse(200,
-				new ServiceSupportInfo(service, new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
+		ServiceSupportResponse response = new ServiceSupportResponse(200, new ServiceSupportInfo(service, spInfo,
+				new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
 
 		Serializer serializer = new JsonSerializer();
 		ServiceSupportResponse response2 = null;
@@ -133,7 +133,5 @@ public class JsonSerializerTest {
 
 		assertEquals(response.getContent(), response2.getContent());
 	}
-	
-	
 
 }

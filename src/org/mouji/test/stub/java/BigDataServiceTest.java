@@ -27,7 +27,7 @@ import org.mouji.stub.java.JsonSerializer;
 import org.mouji.stub.java.stubs.ClientStub;
 import org.mouji.stub.java.stubs.ServerStub;
 
-public class SimpleStubsRunningTest {
+public class BigDataServiceTest {
 	/**
 	 * pointer to a server stub
 	 */
@@ -50,7 +50,7 @@ public class SimpleStubsRunningTest {
 		spInfo = new ServiceProviderInfo("127.0.0.1", serverPort, StubEnvInfo.currentEnvInfo());
 
 		// setting service
-		service = new ServiceInfo<Integer>("add", 1);
+		service = new ServiceInfo<Integer>("data", 1);
 
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
@@ -61,7 +61,7 @@ public class SimpleStubsRunningTest {
 
 			@Override
 			public ServiceSupportInfo service(ServiceInfo<?> info) throws ServiceNotSupportedException {
-				return new ServiceSupportInfo(info,spInfo,  new SerializationFormat[] { SerializationFormat.defaultFotmat() });
+				return new ServiceSupportInfo(info, spInfo, new SerializationFormat[] { SerializationFormat.defaultFotmat() });
 			}
 
 			@Override
@@ -82,10 +82,9 @@ public class SimpleStubsRunningTest {
 							|| !(request.getArgs()[1].getContent() instanceof Integer)) {
 						throw new InvalidArgsException("Both must be integers!!");
 					}
-					Integer num1 = (Integer) request.getArgs()[0].getContent();
-					Integer num2 = (Integer) request.getArgs()[1].getContent();
-					return new ServiceResponse<>(request.getService(), new SerializedObject<>(num1 + num2),
-							request.getRequestId());
+					double[][] data = (double[][]) request.getArgs()[0].getContent();
+					return new ServiceResponse<>(request.getService(),
+							new SerializedObject<>(new Long(data.length * data[0].length)), request.getRequestId());
 				} else {
 					throw new ServiceNotSupportedException(request.getService());
 				}
@@ -101,45 +100,23 @@ public class SimpleStubsRunningTest {
 	}
 
 	@Test
-	public void testPing() throws Exception {
-		boolean ping = clientStub.ping(spInfo);
-		assertTrue(ping);
-	}
-
-	@Test
-	public void testInfo() throws Exception {
-		ServiceProviderInfo provider = clientStub.getInfo(spInfo);
-		assertEquals(provider, spInfo);
-	}
-
-	@Test
-	public void testService() throws Exception {
-		ServiceSupportInfo support = clientStub.getServiceSupport(spInfo, service);
-
-		System.out.println(support.getSerializers()[0]);
-		System.out.println(SerializationFormat.defaultFotmat());
-		System.out.println("--");
-		// checking service information
-		assertEquals(service, support.getService());
-		// // checking number of formats
-		assertEquals(support.getSerializers().length, 1);
-		// // checking format information
-		assertEquals(support.getSerializers()[0], SerializationFormat.defaultFotmat());
-	}
-
-	@Test
 	public void testExecute() throws Exception {
-		ServiceResponse<Integer> response = clientStub.call(service, spInfo, new Integer[] { 4, 5 },
-				new JsonSerializer());
-
-		// checking service information
-		assertEquals(service, response.getService());
-		//
-		// checking class of result
-		assertEquals(Integer.class, response.getContent().getClass());
-
-		// value of results to be equal
-		assertEquals(new Integer(9), response.getContent());
+		
+		double[][] data = generateNumericData(1000, 100000, 100000000, 1000000000, false);
+		JsonSerializer ser = new JsonSerializer();
+		byte[] bytes = 	ser.serialize(data, double[][].class);
+		
+//		ServiceResponse<Integer> response = clientStub.call(service, spInfo, new Integer[] { 4, 5 },
+//				new JsonSerializer());
+//
+//		// checking service information
+//		assertEquals(service, response.getService());
+//		//
+//		// checking class of result
+//		assertEquals(Integer.class, response.getContent().getClass());
+//
+//		// value of results to be equal
+//		assertEquals(new Boolean(true), response.getContent());
 	}
 
 	@AfterClass
@@ -149,6 +126,21 @@ public class SimpleStubsRunningTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static double[][] generateNumericData(int width, int length, double minRange, double maxRange,
+			boolean round) {
+		double span = maxRange - minRange;
+		double[][] data = new double[width][length];
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < length; j++) {
+				data[i][j] = Math.random() * span + minRange;
+				if (round) {
+					data[i][j] = data[i][j] * 100 / 100;
+				}
+			}
+		}
+		return data;
 	}
 
 }
