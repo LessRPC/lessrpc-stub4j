@@ -207,19 +207,20 @@ public class ClientStub extends BasicStub implements StubConstants {
 
 		String contentType = response.getHeaders().get("Content-type");
 
+		System.out.println(contentType);
 		if (contentType == null || contentType.length() < 1) {
-			throw new ResponseContentTypeCannotBePrasedException();
+			throw new ResponseContentTypeCannotBePrasedException(contentType);
 		}
 		// read format
 		SerializationFormat format = null;
 		try {
 			format = SerializationFormat.parseHTTPFormat(contentType);
 		} catch (Exception e) {
-			throw new ResponseContentTypeCannotBePrasedException();
+			throw new ResponseContentTypeCannotBePrasedException(contentType);
 		}
 		// if no format was read
 		if (format == null) {
-			throw new ResponseContentTypeCannotBePrasedException();
+			throw new ResponseContentTypeCannotBePrasedException(contentType);
 		}
 
 		Serializer serializer = getSerializer(format);
@@ -231,6 +232,7 @@ public class ClientStub extends BasicStub implements StubConstants {
 		// checking status
 		if (response.getStatus() != HttpServletResponse.SC_OK) {
 			TextResponse error = readError(listener, serializer);
+			System.out.println(error);
 			throw new RPCException(error.getStatus(), error.getContent());
 		}
 

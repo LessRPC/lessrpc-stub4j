@@ -10,12 +10,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.mouji.common.errors.AcceptTypeHTTPFormatNotParsable;
+import org.mouji.common.errors.AcceptTypeNotSupported;
 import org.mouji.common.errors.ApplicationSpecificErrorException;
+import org.mouji.common.errors.ContentTypeHTTPFormatNotParsable;
+import org.mouji.common.errors.ContentTypeNotSupported;
 import org.mouji.common.errors.ExecuteInternalError;
 import org.mouji.common.errors.InvalidArgsException;
 import org.mouji.common.errors.SerializationFormatHTTPNotParsable;
 import org.mouji.common.errors.ServiceNotSupportedException;
 import org.mouji.common.errors.UnderterminableCodeException;
+import org.mouji.common.errors.WrongHTTPMethodException;
 import org.mouji.common.info.SerializationFormat;
 import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceRequest;
@@ -56,12 +61,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 				handleLessRPC(target, baseRequest, request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
-				// System.err.println("error happened that wasn't handled");
+				System.err.println("error happened that wasn't handled");
 				// response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				// baseRequest.setHandled(true);
 				try {
-					sendStatus(StatusType.ACCEPT_TYPE_NOT_SUPPORTED, baseRequest, response,
-							SerializationFormat.defaultFotmat());
+					sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, SerializationFormat.defaultFotmat());
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -75,10 +79,9 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	}
 
 	private void handlePing(String target, Request baseRequest, HttpServletRequest request,
-			HttpServletResponse response, Serializer serializer, Serializer requestSerializer)
+			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws UnderterminableCodeException, Exception {
-		response.setContentType(serializer.getType().httpFormat());
-		response.getOutputStream().write(serializer.serialize(
+		response.getOutputStream().write(responseSerializer.serialize(
 				new IntegerResponse(StatusType.OK.toCode(), provider.ping() ? 1 : 0), IntegerResponse.class));
 		baseRequest.setHandled(true);
 
@@ -86,78 +89,49 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	}
 
 	private void handleLessRPC(String target, Request baseRequest, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+			HttpServletResponse response) throws UnderterminableCodeException, Exception {
 		boolean inputRequired = false;
+		Serializer responseSerializer = null;
+		Serializer requestSerializer = null;
 
 		if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_EXECUTE)
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_SERVICE)) {
 			inputRequired = true;
 		}
 
-		Serializer requestSerializer = null;
-		SerializationFormat requestFormat = null;
-
-		// check method to be POST
-		if (inputRequired) {
-			if (!request.getMethod().toLowerCase().equals("post")) {
-				sendStatus(StatusType.WRONG_HTTP_METHOD, baseRequest, response, SerializationFormat.defaultFotmat());
-				return;
-			}
-		}
-
-		// check if content-type exists and it is parsable
-		if (request.getHeader("Content-type") != null && request.getHeader("Content-type").length() > 0) {
-
-			try {
-				requestFormat = SerializationFormat.parseHTTPFormat(request.getHeader("Content-type"));
-			} catch (Exception e) {
-				sendStatus(StatusType.CONTENT_TYPE_CANNOT_BE_PARSED, baseRequest, response,
-						SerializationFormat.defaultFotmat());
-				return;
-			}
-			requestSerializer = stub.getSerializer(requestFormat);
-			if (requestSerializer == null) {
-				sendStatus(StatusType.CONTENT_TYPE_NOT_SUPPORTED, baseRequest, response,
-						SerializationFormat.defaultFotmat());
-				return;
-			}
-		} else {
-			if (inputRequired) {
-				sendStatus(StatusType.CONTENT_TYPE_CANNOT_BE_PARSED, baseRequest, response,
-						SerializationFormat.defaultFotmat());
-				return;
-			}
-		}
-
-		// checking accept header exists
-		if (request.getHeader("Accept") == null || request.getHeader("Accept").length() == 0) {
-			sendStatus(StatusType.ACCEPT_TYPE_CANNOT_BE_PARSED, baseRequest, response,
-					SerializationFormat.defaultFotmat());
-			return;
-		}
-
-		// checking accepted formats
-		SerializationFormat[] formats;
+		// check if accept type is parsable and supported
 		try {
-			formats = parseAcceptedFormats(request);
-		} catch (Exception e) {
+			responseSerializer = parseAcceptFormat(target, baseRequest, request, response);
+		} catch (AcceptTypeHTTPFormatNotParsable e) {
+			response.setContentType(SerializationFormat.defaultFotmat().httpFormat());
 			sendStatus(StatusType.ACCEPT_TYPE_CANNOT_BE_PARSED, baseRequest, response,
 					SerializationFormat.defaultFotmat());
-			return;
-		}
-
-		// getting the first supported serializer
-		SerializationFormat responeFormat = stub.findFirstAcceptedFormat(formats);
-		if (responeFormat == null) {
-			// no serialization is supported
+		} catch (AcceptTypeNotSupported e) {
+			response.setContentType(SerializationFormat.defaultFotmat().httpFormat());
 			sendStatus(StatusType.ACCEPT_TYPE_NOT_SUPPORTED, baseRequest, response,
 					SerializationFormat.defaultFotmat());
-			return;
+		}
+		// setting response serialization format regardless if there is an error
+		// or successful attempt
+		response.setContentType(responseSerializer.getType().httpFormat());
+
+		// check if get and post are being used properly
+		try {
+			checkHTTPMethodType(target, baseRequest, request, response, inputRequired);
+		} catch (WrongHTTPMethodException e) {
+			sendStatus(StatusType.WRONG_HTTP_METHOD, baseRequest, response, responseSerializer.getType());
 		}
 
-		// getting first client's priority that is supported
-		Serializer responseSerializer = stub.getSerializer(responeFormat);
+		// check if content-type exists and it is parsable and supported
+		try {
+			requestSerializer = parseContentType(target, baseRequest, request, response, inputRequired);
+		} catch (ContentTypeHTTPFormatNotParsable e) {
+			sendStatus(StatusType.CONTENT_TYPE_CANNOT_BE_PARSED, baseRequest, response, responseSerializer.getType());
+		} catch (ContentTypeNotSupported e) {
+			sendStatus(StatusType.CONTENT_TYPE_NOT_SUPPORTED, baseRequest, response, responseSerializer.getType());
+		}
 
+		response.setContentType(responseSerializer.getType().httpFormat());
 		// -------- start handling response
 		if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_PING)) {
 			handlePing(target, baseRequest, request, response, responseSerializer, requestSerializer);
@@ -174,11 +148,73 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 	}
 
+	private Serializer parseContentType(String target, Request baseRequest, HttpServletRequest request,
+			HttpServletResponse response, boolean inputRequired)
+					throws ContentTypeHTTPFormatNotParsable, ContentTypeNotSupported {
+
+		String contentType = request.getHeader("Content-type");
+
+		SerializationFormat requestFormat = null;
+		Serializer requestSerializer = null;
+
+		if (contentType != null && contentType.length() > 0) {
+
+			try {
+				requestFormat = SerializationFormat.parseHTTPFormat(request.getHeader("Content-type"));
+			} catch (Exception e) {
+				throw new ContentTypeHTTPFormatNotParsable(contentType);
+			}
+			requestSerializer = stub.getSerializer(requestFormat);
+			if (requestSerializer == null) {
+				throw new ContentTypeNotSupported(requestFormat);
+			}
+		} else {
+			if (inputRequired) {
+				throw new ContentTypeHTTPFormatNotParsable(contentType);
+			}
+		}
+
+		return requestSerializer;
+	}
+
+	private void checkHTTPMethodType(String target, Request baseRequest, HttpServletRequest request,
+			HttpServletResponse response, boolean inputRequired) throws WrongHTTPMethodException {
+		// check method to be POST
+		if (inputRequired) {
+			if (!request.getMethod().toLowerCase().equals("post")) {
+				throw new WrongHTTPMethodException();
+			}
+		}
+	}
+
+	private Serializer parseAcceptFormat(String target, Request baseRequest, HttpServletRequest request,
+			HttpServletResponse response) throws AcceptTypeHTTPFormatNotParsable, AcceptTypeNotSupported {
+		// checking accept header exists
+		String acceptType = request.getHeader("Accept");
+		if (acceptType == null || acceptType.length() == 0) {
+			throw new AcceptTypeHTTPFormatNotParsable(acceptType);
+		}
+		// checking accepted formats
+		SerializationFormat[] formats;
+		try {
+			formats = parseAcceptedFormats(request);
+		} catch (Exception e) {
+			throw new AcceptTypeHTTPFormatNotParsable(acceptType);
+		}
+
+		// getting the first supported serializer
+		SerializationFormat responeFormat = stub.findFirstAcceptedFormat(formats);
+		if (responeFormat == null) {
+			throw new AcceptTypeNotSupported(responeFormat);
+		}
+
+		// getting first client's priority that is supported
+		return stub.getSerializer(responeFormat);
+	}
+
 	private void handleInfo(String target, Request baseRequest, HttpServletRequest request,
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws Exception {
-
-		response.setContentType(responseSerializer.getType().httpFormat());
 		response.getOutputStream().write(responseSerializer.serialize(
 				new ProviderInfoResponse(StatusType.OK.toCode(), provider.info()), ProviderInfoResponse.class));
 		baseRequest.setHandled(true);
@@ -195,6 +231,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		ServiceRequest serviceRequest = null;
 
 		ServletInputStream is = null;
+
 		// checking if there is a content to POST request
 		try {
 			is = request.getInputStream();
@@ -207,7 +244,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			serviceRequest = requestSerializer.deserialize(is, ServiceRequest.class);
 		} catch (Exception e) {
 			e.printStackTrace();
-			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
@@ -227,18 +264,18 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			// setting request as handled
 			baseRequest.setHandled(true);
 		} catch (ExecuteInternalError e) {
-			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
 		} catch (InvalidArgsException e) {
-			sendStatus(StatusType.INVALID_ARGS, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.INVALID_ARGS,e.getMessage(), baseRequest, response, responseSerializer.getType());
 			return;
 		} catch (ServiceNotSupportedException e) {
-			sendStatus(StatusType.SERVICE_NOT_SUPPORTED, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.SERVICE_NOT_SUPPORTED, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
 		if (serviceResponse == null) {
-			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
@@ -261,19 +298,19 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		ServiceInfo<?> info = null;
 
 		ServletInputStream is = null;
+
 		// checking if there is a content to POST request
 		try {
 			is = request.getInputStream();
 		} catch (Exception e) {
-			sendStatus(StatusType.POST_CONTENT_NOT_AVAILABLE, baseRequest, response,
-					SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.POST_CONTENT_NOT_AVAILABLE, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
 		try {
 			info = requestSerializer.deserialize(is, ServiceInfo.class);
 		} catch (Exception e) {
-			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
@@ -281,16 +318,14 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		try {
 			service = provider.service(info);
 		} catch (ServiceNotSupportedException e) {
-			sendStatus(StatusType.SERVICE_NOT_SUPPORTED, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.SERVICE_NOT_SUPPORTED, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
 		if (service == null) {
-			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, SerializationFormat.defaultFotmat());
+			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
 		}
-
-		response.setContentType(responseSerializer.getType().httpFormat());
 
 		responseSerializer.serialize(new ServiceSupportResponse(StatusType.OK.toCode(), service),
 				ServiceSupportResponse.class, response.getOutputStream());
@@ -306,6 +341,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 	private void sendStatus(StatusType status, Request baseRequest, HttpServletResponse response,
 			SerializationFormat format) throws Exception {
+		sendStatus(status, status.name(), baseRequest, response, format);
+	}
+
+	private void sendStatus(StatusType status, String statusContent, Request baseRequest, HttpServletResponse response,
+			SerializationFormat format) throws Exception {
 		// setting status of http
 		response.setStatus(status.httpMatchingStatus());
 
@@ -313,7 +353,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		Serializer serializer = stub.getSerializer(format);
 
 		response.getOutputStream()
-				.write(serializer.serialize(new TextResponse(status.toCode(), status.name()), TextResponse.class));
+				.write(serializer.serialize(new TextResponse(status.toCode(), statusContent), TextResponse.class));
 
 		// setting request as handled
 		baseRequest.setHandled(true);
