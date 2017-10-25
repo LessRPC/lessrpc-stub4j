@@ -1,13 +1,7 @@
 package org.mouji.stub.java.stubs;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
-import org.eclipse.jetty.server.Server;
-
-import org.mouji.common.info.NameServerInfo;
-import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.serializer.Serializer;
 
 public class NSServerStub extends BasicStub {

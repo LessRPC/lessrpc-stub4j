@@ -61,7 +61,8 @@ public class SimpleStubsRunningTest {
 
 			@Override
 			public ServiceSupportInfo service(ServiceInfo<?> info) throws ServiceNotSupportedException {
-				return new ServiceSupportInfo(info,spInfo,  new SerializationFormat[] { SerializationFormat.defaultFotmat() });
+				return new ServiceSupportInfo(info, spInfo,
+						new SerializationFormat[] { SerializationFormat.defaultFotmat() });
 			}
 
 			@Override
@@ -108,7 +109,7 @@ public class SimpleStubsRunningTest {
 
 	@Test
 	public void testInfo() throws Exception {
-		ServiceProviderInfo provider = clientStub.getInfo(spInfo);
+		ServiceProviderInfo provider = clientStub.getInfo(spInfo.getURL(), spInfo.getPort());
 		assertEquals(provider, spInfo);
 	}
 
@@ -116,9 +117,9 @@ public class SimpleStubsRunningTest {
 	public void testService() throws Exception {
 		ServiceSupportInfo support = clientStub.getServiceSupport(spInfo, service);
 
-		System.out.println(support.getSerializers()[0]);
-		System.out.println(SerializationFormat.defaultFotmat());
-		System.out.println("--");
+		// System.out.println(support.getSerializers()[0]);
+		// System.out.println(SerializationFormat.defaultFotmat());
+		// System.out.println("--");
 		// checking service information
 		assertEquals(service, support.getService());
 		// // checking number of formats

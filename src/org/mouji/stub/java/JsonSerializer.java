@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.info.responses.TextResponse;
 import org.mouji.common.serializer.Serializer;
 
 import com.fasterxml.jackson.core.JsonFactory;

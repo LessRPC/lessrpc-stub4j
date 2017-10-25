@@ -20,7 +20,7 @@ public class BasicStub {
 	/**
 	 * list of supported serializers. Default is included in constructor
 	 */
-	protected List<Serializer> serializers;
+	private final List<Serializer> serializers;
 
 	/**
 	 * map of format to serializer instance
@@ -42,7 +42,7 @@ public class BasicStub {
 
 		if (!hasJson) {
 			JsonSerializer js = new JsonSerializer();
-			this.serializers.add(js);
+			this.getSerializers().add(js);
 			serializerMap.put(js.getType(), js);
 		}
 	}
@@ -65,9 +65,9 @@ public class BasicStub {
 	 */
 	protected String getAcceptedTypes() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < serializers.size(); i++) {
-			sb.append(serializers.get(i).getType().httpFormat());
-			if (i != serializers.size() - 1) {
+		for (int i = 0; i < getSerializers().size(); i++) {
+			sb.append(getSerializers().get(i).getType().httpFormat());
+			if (i != getSerializers().size() - 1) {
 				sb.append(" , ");
 			}
 		}
@@ -84,5 +84,10 @@ public class BasicStub {
 		rand.setSeed(System.currentTimeMillis());
 		return rand.nextLong();
 	}
+
+	public List<Serializer> getSerializers() {
+		return serializers;
+	}
+
 
 }

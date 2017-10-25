@@ -4,17 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.mouji.stub.java.StubConstants;
-import org.mouji.stub.java.errors.RPCException;
-import org.mouji.stub.java.errors.RPCProviderFailureException;
-import org.mouji.stub.java.errors.ResponseContentTypeCannotBePrasedException;
-import org.mouji.stub.java.errors.SerializationFormatNotSupported;
-
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.BytesContentProvider;
@@ -22,6 +16,10 @@ import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.client.util.OutputStreamContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
 import org.mouji.common.serializer.Serializer;
+import org.mouji.common.errors.RPCException;
+import org.mouji.common.errors.RPCProviderFailureException;
+import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
+import org.mouji.common.errors.SerializationFormatNotSupported;
 import org.mouji.common.info.SerializationFormat;
 import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceProviderInfo;
@@ -88,14 +86,14 @@ public class ClientStub extends BasicStub implements StubConstants {
 	 * @return
 	 * @throws Exception
 	 */
-	public ServiceProviderInfo getInfo(ServiceProviderInfo info) throws Exception {
+	public ServiceProviderInfo getInfo(String url, int port) throws Exception {
 		HttpClient client = new HttpClient();
 		client.start();
 
 		InputStreamResponseListener listener = new InputStreamResponseListener();
 
-		client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_INFO)
-				.method(HttpMethod.GET).accept(getAcceptedTypes()).send(listener);
+		client.newRequest(HTTP_PROTOCOL + url + ":" + port + LESS_RPC_REQUEST_INFO).method(HttpMethod.GET)
+				.accept(getAcceptedTypes()).send(listener);
 
 		ProviderInfoResponse infoResponse = readResponse(listener, ProviderInfoResponse.class, HTTP_WAIT_TIME_SHORT);
 
@@ -180,6 +178,7 @@ public class ClientStub extends BasicStub implements StubConstants {
 
 		client.stop();
 
+		// System.out.println(execResponse);
 		return execResponse.getContent();
 
 	}
@@ -241,7 +240,6 @@ public class ClientStub extends BasicStub implements StubConstants {
 			// byte[] bytes = new
 			// Scanner(responseContent).useDelimiter("\\Z").next().getBytes();
 			// System.out.println(new String(bytes));
-
 			return serializer.deserialize(responseContent, cls);
 		}
 
@@ -267,45 +265,5 @@ public class ClientStub extends BasicStub implements StubConstants {
 			throw new RPCProviderFailureException();
 		}
 	}
-
-	// @SuppressWarnings("unchecked")
-	// private <T> T call(ServiceInfo<T> service, ServiceProviderInfo provider,
-	// Object[] args) throws Throwable {
-	//
-	// HttpClient client = new HttpClient();
-	//
-	// JsonRpcHttpClient client = new JsonRpcHttpClient(new URL(RPC_PROTOCOL +
-	// provider.getIp() + ":"
-	// + provider.getPort() + "/" + ProviderService.class.getSimpleName() +
-	// ".json"));
-	//
-	// ServiceResponse response = client.invoke("execute", new Object[] {
-	// new ClientInfo(Inet4Address.getLocalHost().getHostAddress(),
-	// StubLangType.JAVA), service, args },
-	// ServiceResponse.class);
-	// ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-	// return (T) mapper.readValue(response.getResultJson(),
-	// Class.forName(response.getInfo().getOutputType()));
-	// }
-
-	// private ServiceProviderInfo findProvider(ServiceInfo<?> service) throws
-	// Throwable {
-	// JsonRpcHttpClient client = new JsonRpcHttpClient(new URL(RPC_PROTOCOL +
-	// nsInfo.getAddress() + ":"
-	// + nsInfo.getPort() + "/" + NSService.class.getSimpleName() + ".json"));
-	// ServiceProviderInfo provider = client.invoke("getServerById", new
-	// Object[] { service.getId() },
-	// ServiceProviderInfo.class);
-	// return provider;
-	// }
-
-	// public <T> T execute(ServiceInfo<T> service, ServiceProviderInfo
-	// provider, Object[] args)
-	// throws MalformedURLException, ServiceProviderNotAvailable, Throwable {
-	//// ServiceProviderInfo provider = findProvider(service);
-	// if (provider == null)
-	// throw new ServiceProviderNotAvailable(service);
-	// return call(service, provider, args);
-	// }
 
 }

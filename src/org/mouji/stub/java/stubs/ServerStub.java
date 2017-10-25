@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.mouji.common.errors.ServerStubNotInitialized;
 import org.mouji.common.info.SerializationFormat;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.common.services.ServiceProvider;
-import org.mouji.stub.java.errors.ServerStubNotInitialized;
 
 public class ServerStub extends BasicStub {
 

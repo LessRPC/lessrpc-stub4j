@@ -99,7 +99,6 @@ public class BigDataServiceTest {
 
 	}
 
-	@Test
 	public void testExecute() throws Exception {
 		
 		double[][] data = generateNumericData(1000, 100000, 100000000, 1000000000, false);

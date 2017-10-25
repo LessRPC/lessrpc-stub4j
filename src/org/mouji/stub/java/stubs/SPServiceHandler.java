@@ -55,7 +55,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			try {
 				handleLessRPC(target, baseRequest, request, response);
 			} catch (Exception e) {
-				System.err.println("error happened that wasn't handled");
+				e.printStackTrace();
+				// System.err.println("error happened that wasn't handled");
 				// response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				// baseRequest.setHandled(true);
 				try {
@@ -243,8 +244,6 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 		// writing service response
 		response.setContentType(responseSerializer.getType().httpFormat());
-		responseSerializer.serialize(new ExecuteRequestResponse<>(StatusType.OK.toCode(), serviceResponse),
-				ExecuteRequestResponse.class, System.out);
 		// serializing response
 		responseSerializer.serialize(new ExecuteRequestResponse<>(StatusType.OK.toCode(), serviceResponse),
 				ExecuteRequestResponse.class, response.getOutputStream());
