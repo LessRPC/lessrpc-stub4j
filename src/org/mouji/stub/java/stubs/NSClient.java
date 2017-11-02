@@ -9,7 +9,6 @@ import org.mouji.common.errors.RPCException;
 import org.mouji.common.errors.RPCProviderFailureException;
 import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
 import org.mouji.common.errors.SerializationFormatNotSupported;
-import org.mouji.common.info.NameServerInfo;
 import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceProviderInfo;
 import org.mouji.common.info.ServiceSupportInfo;
@@ -27,9 +26,9 @@ public class NSClient extends ClientStub implements NameServerServices, NameServ
 	 */
 	private final ServiceProviderInfo nsSPInfo;
 
-	public NSClient(NameServerInfo nsInfo, List<Serializer> serializers) throws Exception {
+	public NSClient(ServiceProviderInfo nsInfo, List<Serializer> serializers)  {
 		super(serializers);
-		this.nsSPInfo = getInfo(nsInfo.getAddress(), nsInfo.getPort());
+		this.nsSPInfo = nsInfo;
 
 	}
 

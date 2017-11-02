@@ -100,9 +100,15 @@ public class ClientStub extends BasicStub implements StubConstants {
 	 * 
 	 * @param info
 	 * @return
+	 * @throws IOException
+	 * @throws RPCProviderFailureException
+	 * @throws RPCException
+	 * @throws SerializationFormatNotSupported
+	 * @throws ResponseContentTypeCannotBePrasedException
 	 * @throws Exception
 	 */
-	public ServiceProviderInfo getInfo(String url, int port) throws Exception {
+	public ServiceProviderInfo getInfo(String url, int port) throws ResponseContentTypeCannotBePrasedException,
+			SerializationFormatNotSupported, RPCException, RPCProviderFailureException, IOException, Exception {
 		HttpClient client = new HttpClient();
 		client.start();
 
@@ -261,7 +267,7 @@ public class ClientStub extends BasicStub implements StubConstants {
 	}
 
 	/**
-	 * reads error messasge from input
+	 * reads error message from input
 	 * 
 	 * @param listener
 	 * @param serializer

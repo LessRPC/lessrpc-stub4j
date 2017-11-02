@@ -14,17 +14,17 @@ public class ServerStub extends BasicStub {
 	/**
 	 * pointer to service provider used to generate response for requests
 	 */
-	private ServiceProvider provider;
+	protected ServiceProvider provider;
 	/**
 	 * port for server stub
 	 */
-	private final int port;
+	protected final int port;
 
-	private Thread serverThread;
+	protected Thread serverThread;
 
-	private Server server;
+	protected Server server;
 
-	public ServerStub(List<Serializer> serializers, int port) {
+	public ServerStub(int port, List<Serializer> serializers) {
 		super(serializers);
 		this.port = port;
 	}
@@ -39,6 +39,8 @@ public class ServerStub extends BasicStub {
 		if (provider == null) {
 			throw new ServerStubNotInitialized();
 		}
+
+		beforeStart();
 
 		// server started
 		// QueuedThreadPool threadPool = new QueuedThreadPool();
@@ -69,10 +71,30 @@ public class ServerStub extends BasicStub {
 
 		serverThread.start();
 
+		afterStart();
+
+	}
+
+	protected void afterStart() throws Exception{
+		// do nothing in this version
+	}
+
+	protected void beforeStart() throws Exception{
+		// do nothing in this version
 	}
 
 	public void stop() throws Exception {
+		beforeStop();
 		server.stop();
+		afterStop();
+	}
+
+	protected void afterStop() throws Exception{
+		// do nothing in this version
+	}
+
+	protected void beforeStop() throws Exception {
+		// Do nothing for this version
 	}
 
 	public ServiceProvider getProvider() {

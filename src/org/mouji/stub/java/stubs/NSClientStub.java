@@ -8,7 +8,6 @@ import org.mouji.common.errors.RPCProviderFailureException;
 import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
 import org.mouji.common.errors.SerializationFormatNotSupported;
 import org.mouji.common.errors.ServiceProviderNotAvailable;
-import org.mouji.common.info.NameServerInfo;
 import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceProviderInfo;
 import org.mouji.common.info.ServiceSupportInfo;
@@ -20,11 +19,6 @@ import org.mouji.stub.java.spcache.ServiceProviderCache;
 
 public class NSClientStub extends ClientStub implements StubConstants {
 
-	/**
-	 * name server info instance
-	 */
-	private final NameServerInfo nsInfo;
-
 	private NSClient ns;
 
 	/**
@@ -32,10 +26,11 @@ public class NSClientStub extends ClientStub implements StubConstants {
 	 */
 	private final ServiceProviderCache cache;
 
-	public NSClientStub(NameServerInfo nsInfo, ServiceProviderCache cache, List<Serializer> serializers)
-			throws Exception {
+	private ServiceProviderInfo nsInfo;
+
+	public NSClientStub(ServiceProviderInfo nsInfo, ServiceProviderCache cache, List<Serializer> serializers) {
 		super(serializers);
-		this.nsInfo = nsInfo;
+		this.setNsInfo(nsInfo);
 		this.cache = cache;
 		this.ns = new NSClient(nsInfo, serializers);
 	}
@@ -139,8 +134,12 @@ public class NSClientStub extends ClientStub implements StubConstants {
 		return ns.getServiceInfoByName(serviceName);
 	}
 
-	public NameServerInfo getNsInfo() {
+	public ServiceProviderInfo getNsInfo() {
 		return nsInfo;
+	}
+
+	public void setNsInfo(ServiceProviderInfo nsInfo) {
+		this.nsInfo = nsInfo;
 	}
 
 }

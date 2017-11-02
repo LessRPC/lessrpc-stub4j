@@ -55,7 +55,7 @@ public class SimpleStubsRunningTest {
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
 
-		serverStub = new ServerStub(list, serverPort);
+		serverStub = new ServerStub(serverPort, list);
 
 		ServiceProvider serviceProvider = new ServiceProvider() {
 
@@ -91,6 +91,14 @@ public class SimpleStubsRunningTest {
 					throw new ServiceNotSupportedException(request.getService());
 				}
 			}
+
+			@Override
+			public List<ServiceSupportInfo> listSupport() {
+				List<ServiceSupportInfo> list = new ArrayList<ServiceSupportInfo>();
+				list.add(new ServiceSupportInfo(service, spInfo,
+						new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
+				return list;
+			}
 		};
 		ServiceProvider provider = serviceProvider;
 		serverStub.init(provider);
@@ -124,6 +132,8 @@ public class SimpleStubsRunningTest {
 		// // checking format information
 		assertEquals(support.getSerializers()[0], SerializationFormat.defaultFotmat());
 	}
+	
+
 
 	@Test
 	public void testExecute() throws Exception {
@@ -139,6 +149,8 @@ public class SimpleStubsRunningTest {
 		// value of results to be equal
 		assertEquals(new Integer(9), response.getContent());
 	}
+	
+	
 
 	@AfterClass
 	public static void closeAfterTests() {
@@ -148,5 +160,7 @@ public class SimpleStubsRunningTest {
 			e.printStackTrace();
 		}
 	}
+	
+	
 
 }

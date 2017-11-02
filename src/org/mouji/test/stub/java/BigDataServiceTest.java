@@ -3,12 +3,10 @@ package org.mouji.test.stub.java;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
 import org.mouji.common.errors.ApplicationSpecificErrorException;
 import org.mouji.common.errors.ExecuteInternalError;
 import org.mouji.common.errors.InvalidArgsException;
@@ -55,7 +53,7 @@ public class BigDataServiceTest {
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
 
-		serverStub = new ServerStub(list, serverPort);
+		serverStub = new ServerStub(serverPort,list);
 
 		ServiceProvider serviceProvider = new ServiceProvider() {
 
@@ -88,6 +86,13 @@ public class BigDataServiceTest {
 				} else {
 					throw new ServiceNotSupportedException(request.getService());
 				}
+			}
+
+			@Override
+			public List<ServiceSupportInfo> listSupport() {
+				List<ServiceSupportInfo> list = new ArrayList<ServiceSupportInfo>();
+				list.add(new ServiceSupportInfo(service, spInfo, new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
+				return list;
 			}
 		};
 		ServiceProvider provider = serviceProvider;
