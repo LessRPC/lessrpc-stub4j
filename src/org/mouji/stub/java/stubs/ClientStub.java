@@ -58,6 +58,7 @@ public class ClientStub extends BasicStub implements StubConstants {
 	 * @throws Exception
 	 */
 	public boolean ping(ServiceProviderInfo info) throws Exception {
+		boolean flag = true;
 
 		HttpClient client = new HttpClient();
 		client.start();
@@ -67,14 +68,29 @@ public class ClientStub extends BasicStub implements StubConstants {
 		client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_PING)
 				.method(HttpMethod.GET).accept(getAcceptedTypes()).send(listener);
 
-		IntegerResponse ping = readResponse(listener, IntegerResponse.class, HTTP_WAIT_TIME_SHORT);
+		IntegerResponse ping = null;
+		try {
+			ping = readResponse(listener, IntegerResponse.class, HTTP_WAIT_TIME_SHORT);
+		} catch (ResponseContentTypeCannotBePrasedException e) {
+			throw e;
+		} catch (SerializationFormatNotSupported e) {
+			throw e;
+		} catch (RPCException e) {
+			throw e;
+		} catch (RPCProviderFailureException e) {
+			throw e;
+		} catch (IOException e) {
+			flag = false;
+		} catch (Exception e) {
+			flag = false;
+		}
 
 		client.stop();
 
-		if (ping.getContent() == 1) {
-			return true;
-		} else {
+		if (!flag || ping == null || ping.getContent() != 1) {
 			return false;
+		} else {
+			return true;
 		}
 
 	}

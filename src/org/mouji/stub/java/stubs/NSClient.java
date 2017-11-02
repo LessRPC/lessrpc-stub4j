@@ -1,8 +1,10 @@
 package org.mouji.stub.java.stubs;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
+import org.mouji.common.errors.DatabaseNotSupported;
 import org.mouji.common.errors.RPCException;
 import org.mouji.common.errors.RPCProviderFailureException;
 import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
@@ -25,7 +27,7 @@ public class NSClient extends ClientStub implements NameServerServices, NameServ
 	 */
 	private final ServiceProviderInfo nsSPInfo;
 
-	public NSClient(NameServerInfo nsInfo, List<Serializer> serializers) throws Exception{
+	public NSClient(NameServerInfo nsInfo, List<Serializer> serializers) throws Exception {
 		super(serializers);
 		this.nsSPInfo = getInfo(nsInfo.getAddress(), nsInfo.getPort());
 
@@ -91,6 +93,23 @@ public class NSClient extends ClientStub implements NameServerServices, NameServ
 	@Override
 	public boolean ping() throws Exception {
 		return ping(nsSPInfo);
+	}
+
+	@Override
+	public boolean unregisterAll(ServiceProviderInfo provider) throws ClassNotFoundException, SQLException,
+			DatabaseNotSupported, ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported,
+			RPCException, RPCProviderFailureException, IOException, Exception {
+		ServiceResponse<Boolean> response = this.call(UNREGISTER_ALL, nsSPInfo, new Object[] { provider },
+				new JsonSerializer());
+		return response.getContent();
+	}
+
+	@Override
+	public boolean checkProviderStatus(ServiceProviderInfo provider) throws ResponseContentTypeCannotBePrasedException,
+			SerializationFormatNotSupported, RPCException, RPCProviderFailureException, IOException, Exception {
+		ServiceResponse<Boolean> response = this.call(CHECK_PROVIDER_STATUS, nsSPInfo, new Object[] { provider },
+				new JsonSerializer());
+		return response.getContent();
 	}
 
 }
