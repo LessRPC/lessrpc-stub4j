@@ -194,7 +194,6 @@ public class ClientStub extends BasicStub implements StubConstants {
 
 		client.stop();
 
-		// System.out.println(execResponse);
 		return execResponse.getContent();
 
 	}
@@ -223,7 +222,6 @@ public class ClientStub extends BasicStub implements StubConstants {
 
 		String contentType = response.getHeaders().get("Content-type");
 
-		System.out.println(contentType);
 		if (contentType == null || contentType.length() < 1) {
 			throw new ResponseContentTypeCannotBePrasedException(contentType);
 		}
@@ -248,7 +246,6 @@ public class ClientStub extends BasicStub implements StubConstants {
 		// checking status
 		if (response.getStatus() != HttpServletResponse.SC_OK) {
 			TextResponse error = readError(listener, serializer);
-			System.out.println(error);
 			throw new RPCException(error.getStatus(), error.getContent());
 		}
 

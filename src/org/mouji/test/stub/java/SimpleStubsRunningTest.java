@@ -117,9 +117,6 @@ public class SimpleStubsRunningTest {
 	public void testService() throws Exception {
 		ServiceSupportInfo support = clientStub.getServiceSupport(spInfo, service);
 
-		// System.out.println(support.getSerializers()[0]);
-		// System.out.println(SerializationFormat.defaultFotmat());
-		// System.out.println("--");
 		// checking service information
 		assertEquals(service, support.getService());
 		// // checking number of formats
