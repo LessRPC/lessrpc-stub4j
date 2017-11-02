@@ -10,10 +10,12 @@ import org.mouji.common.errors.SerializationFormatNotSupported;
 import org.mouji.common.errors.ServiceProviderNotAvailable;
 import org.mouji.common.info.NameServerInfo;
 import org.mouji.common.info.ServiceInfo;
+import org.mouji.common.info.ServiceProviderInfo;
 import org.mouji.common.info.ServiceSupportInfo;
 import org.mouji.common.info.responses.ServiceResponse;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.stub.java.StubConstants;
+import org.mouji.stub.java.errors.NoProviderAvailableException;
 import org.mouji.stub.java.spcache.ServiceProviderCache;
 
 public class NSClientStub extends ClientStub implements StubConstants {
@@ -69,7 +71,34 @@ public class NSClientStub extends ClientStub implements StubConstants {
 	public <T> ServiceResponse<T> call(ServiceInfo<T> service, Object[] args, Serializer serializer)
 			throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported, RPCException,
 			RPCProviderFailureException, IOException, Exception {
-		return call(service, getProvider(service).getProvider(), args, serializer);
+
+		ServiceProviderInfo provider = getProvider(service).getProvider();
+		if (provider == null) {
+			// no provider existed so throw appropriate Exception
+			throw new NoProviderAvailableException(service);
+		}
+		// provider existed so try to connect
+		ServiceResponse<T> response = null;
+		try {
+			response = call(service, provider, args, serializer);
+		} catch (ResponseContentTypeCannotBePrasedException | RPCException | SerializationFormatNotSupported e) {
+			// none connectivity error happened
+			throw e;
+		} catch (RPCProviderFailureException | IOException e) {
+			// a connectivity error happened. So try to find a new Provider
+			// clear cache
+			cache.clearCache(service);
+			// check if provider still works
+			ns.checkProviderStatus(provider);
+			// call again and it will ask for a provider from NameServer
+			// accordingly
+			call(service, args, serializer);
+		} catch (Exception e) {
+			// other none connectivity errors
+			throw e;
+		}
+
+		return response;
 	}
 
 	/**
