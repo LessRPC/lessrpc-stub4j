@@ -68,7 +68,6 @@ public class ServerStub extends BasicStub {
 		});
 
 		serverThread.start();
-		// serverThread.join();
 
 	}
 
