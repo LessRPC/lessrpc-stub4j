@@ -5,7 +5,7 @@ import org.mouji.common.info.SerializedObject;
 import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceProviderInfo;
 import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.StubEnvInfo;
+import org.mouji.common.info.EnvironmentInfo;
 import org.mouji.common.info.responses.ExecuteRequestResponse;
 import org.mouji.common.info.responses.IntegerResponse;
 import org.mouji.common.info.responses.ProviderInfoResponse;
@@ -30,7 +30,7 @@ public class JsonSerializerTest {
 	@BeforeClass
 	public static void init() throws Exception {
 		// setting service provider info
-		spInfo = new ServiceProviderInfo("127.0.0.1", serverPort, StubEnvInfo.currentEnvInfo());
+		spInfo = new ServiceProviderInfo("127.0.0.1", serverPort, EnvironmentInfo.currentEnvInfo());
 
 		// setting service
 		service = new ServiceInfo<Integer>("add", 1);
@@ -40,7 +40,7 @@ public class JsonSerializerTest {
 	public void testSeviceProviderInfoResponse() {
 
 		ProviderInfoResponse response = new ProviderInfoResponse(200,
-				new ServiceProviderInfo("127.0.0.1", 4040, StubEnvInfo.currentEnvInfo()));
+				new ServiceProviderInfo("127.0.0.1", 4040, EnvironmentInfo.currentEnvInfo()));
 
 		Serializer serializer = new JsonSerializer();
 		ProviderInfoResponse response2 = null;

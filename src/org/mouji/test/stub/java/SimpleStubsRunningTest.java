@@ -19,7 +19,7 @@ import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceProviderInfo;
 import org.mouji.common.info.ServiceRequest;
 import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.StubEnvInfo;
+import org.mouji.common.info.EnvironmentInfo;
 import org.mouji.common.info.responses.ServiceResponse;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.common.services.ServiceProvider;
@@ -47,7 +47,7 @@ public class SimpleStubsRunningTest {
 	@BeforeClass
 	public static void initStubs() throws Exception {
 		// setting service provider info
-		spInfo = new ServiceProviderInfo("127.0.0.1", serverPort, StubEnvInfo.currentEnvInfo());
+		spInfo = new ServiceProviderInfo("127.0.0.1", serverPort, EnvironmentInfo.currentEnvInfo());
 
 		// setting service
 		service = new ServiceInfo<Integer>("add", 1);
