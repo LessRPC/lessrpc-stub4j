@@ -14,8 +14,8 @@ import org.mouji.common.info.ServiceSupportInfo;
 import org.mouji.common.info.responses.ServiceResponse;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.stub.java.StubConstants;
+import org.mouji.stub.java.cache.ServiceProviderCache;
 import org.mouji.stub.java.errors.NoProviderAvailableException;
-import org.mouji.stub.java.spcache.ServiceProviderCache;
 
 public class NSClientStub extends ClientStub implements StubConstants {
 

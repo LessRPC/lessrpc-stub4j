@@ -13,7 +13,8 @@ import org.mouji.common.info.responses.ServiceResponse;
 import org.mouji.common.info.responses.ServiceSupportResponse;
 import org.mouji.common.info.responses.TextResponse;
 import org.mouji.common.serializer.Serializer;
-import org.mouji.stub.java.JsonSerializer;
+import org.mouji.stub.java.serializer.JsonSerializer;
+
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;

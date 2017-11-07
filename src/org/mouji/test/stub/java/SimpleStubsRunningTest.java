@@ -23,7 +23,7 @@ import org.mouji.common.info.EnvironmentInfo;
 import org.mouji.common.info.responses.ServiceResponse;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.common.services.ServiceProvider;
-import org.mouji.stub.java.JsonSerializer;
+import org.mouji.stub.java.serializer.JsonSerializer;
 import org.mouji.stub.java.stubs.ClientStub;
 import org.mouji.stub.java.stubs.ServerStub;
 

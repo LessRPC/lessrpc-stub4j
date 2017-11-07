@@ -1,4 +1,4 @@
-package org.mouji.stub.java.spcache;
+package org.mouji.stub.java.cache;
 
 import org.mouji.common.info.ServiceInfo;
 import org.mouji.common.info.ServiceSupportInfo;
@@ -69,6 +69,10 @@ public abstract class ServiceProviderCache {
 	
 	public abstract void reset();
 
+	/**
+	 * Caches a support entry for the service
+	 * @param info
+	 */
 	public abstract void cache(ServiceSupportInfo info);
 	
 	

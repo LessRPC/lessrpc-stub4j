@@ -16,7 +16,7 @@ import org.mouji.common.info.responses.ServiceResponse;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.common.services.NameServerFunctions;
 import org.mouji.common.services.NameServerServices;
-import org.mouji.stub.java.JsonSerializer;
+import org.mouji.stub.java.serializer.JsonSerializer;
 
 public class NSClient extends ClientStub implements NameServerServices, NameServerFunctions {
 

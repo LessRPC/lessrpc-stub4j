@@ -1,4 +1,4 @@
-package org.mouji.stub.java.spcache;
+package org.mouji.stub.java.cache;
 
 import java.util.HashMap;
 

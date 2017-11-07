@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.mouji.common.info.SerializationFormat;
 import org.mouji.common.serializer.Serializer;
-import org.mouji.stub.java.JsonSerializer;
+import org.mouji.stub.java.serializer.JsonSerializer;
 
 /**
  * Basic stub class that provides common functionalities between server stub and
@@ -15,7 +15,7 @@ import org.mouji.stub.java.JsonSerializer;
  * @author Salim
  *
  */
-public class BasicStub {
+public class Stub {
 
 	/**
 	 * list of supported serializers. Default is included in constructor
@@ -27,10 +27,13 @@ public class BasicStub {
 	 */
 	protected HashMap<SerializationFormat, Serializer> serializerMap;
 
-	public BasicStub(List<Serializer> serializers) {
+
+
+	public Stub(List<Serializer> serializers) {
 		boolean hasJson = false;
 
 		this.serializers = serializers;
+
 		// Initializing serializer map
 		this.serializerMap = new HashMap<SerializationFormat, Serializer>();
 		for (Serializer serializer : serializers) {
@@ -88,6 +91,5 @@ public class BasicStub {
 	public List<Serializer> getSerializers() {
 		return serializers;
 	}
-
 
 }

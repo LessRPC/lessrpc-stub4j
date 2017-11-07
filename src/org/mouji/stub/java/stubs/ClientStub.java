@@ -39,7 +39,7 @@ import org.mouji.common.info.responses.TextResponse;
  * @author Salim
  *
  */
-public class ClientStub extends BasicStub implements StubConstants {
+public class ClientStub extends Stub implements StubConstants {
 
 	public ClientStub(List<Serializer> serializers) {
 		super(serializers);

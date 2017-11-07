@@ -1,4 +1,4 @@
-package org.mouji.stub.java.spcache;
+package org.mouji.stub.java.cache;
 
 import org.mouji.common.info.ServiceSupportInfo;
 

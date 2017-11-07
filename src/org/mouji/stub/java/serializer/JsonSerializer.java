@@ -1,4 +1,4 @@
-package org.mouji.stub.java;
+package org.mouji.stub.java.serializer;
 
 import java.io.InputStream;
 import java.io.OutputStream;

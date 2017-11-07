@@ -9,7 +9,7 @@ import org.mouji.common.info.SerializationFormat;
 import org.mouji.common.serializer.Serializer;
 import org.mouji.common.services.ServiceProvider;
 
-public class ServerStub extends BasicStub {
+public class ServerStub extends Stub {
 
 	/**
 	 * pointer to service provider used to generate response for requests
