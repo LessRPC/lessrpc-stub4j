@@ -1,11 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.mouji</groupId>
 	<artifactId>moujistub4j</artifactId>
-	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
+	<name>moujistub4j</name>
 
 	<parent>
 		<groupId>org.mouji</groupId>
@@ -38,7 +37,7 @@
 			<groupId>org.mouji</groupId>
 			<artifactId>moujicommon</artifactId>
 			<version>0.1.0</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty.aggregate/jetty-all -->
@@ -47,7 +46,7 @@
 			<artifactId>jetty-all</artifactId>
 			<version>9.4.0.RC3</version>
 			<type>pom</type>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.github.briandilley.jsonrpc4j/jsonrpc4j -->
@@ -57,7 +56,7 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.9.0.pr4</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.msgpack/msgpack-core -->
@@ -65,7 +64,7 @@
 			<groupId>org.msgpack</groupId>
 			<artifactId>msgpack-core</artifactId>
 			<version>0.8.13</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
@@ -73,7 +72,7 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<version>2.9.0.pr4</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
@@ -81,14 +80,14 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
 			<version>2.9.0.pr4</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>4.0.0-b07</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.portlet/portlet-api -->
@@ -97,28 +96,28 @@
 			<artifactId>portlet-api</artifactId>
 			<version>3.0.0</version>
 			<optional>true</optional>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.20.0</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>6.0.6</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

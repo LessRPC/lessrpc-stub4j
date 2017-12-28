@@ -1,4 +1,4 @@
-package org.mouji.test.stub.java;
+package test.java.stub;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

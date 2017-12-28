@@ -1,4 +1,4 @@
-package org.mouji.test.stub.java;
+package test.java.stub;
 
 import org.mouji.common.info.SerializationFormat;
 import org.mouji.common.info.SerializedObject;
