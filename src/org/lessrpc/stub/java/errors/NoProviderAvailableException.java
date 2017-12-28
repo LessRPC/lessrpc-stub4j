@@ -1,6 +1,6 @@
-package org.mouji.stub.java.errors;
+package org.lessrpc.stub.java.errors;
 
-import org.mouji.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceInfo;
 
 public class NoProviderAvailableException extends Exception {
 

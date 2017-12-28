@@ -1,4 +1,4 @@
-package org.mouji.stub.java.stubs;
+package org.lessrpc.stub.java.stubs;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,31 +8,31 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.mouji.stub.java.StubConstants;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.client.util.OutputStreamContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.common.errors.ApplicationSpecificErrorException;
-import org.mouji.common.errors.RPCException;
-import org.mouji.common.errors.RPCProviderFailureException;
-import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
-import org.mouji.common.errors.SerializationFormatNotSupported;
-import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.info.ServiceInfo;
-import org.mouji.common.info.ServiceProviderInfo;
-import org.mouji.common.info.ServiceRequest;
-import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.responses.ExecuteRequestResponse;
-import org.mouji.common.info.responses.IntegerResponse;
-import org.mouji.common.info.responses.ProviderInfoResponse;
-import org.mouji.common.info.responses.RequestResponse;
-import org.mouji.common.info.responses.ServiceResponse;
-import org.mouji.common.info.responses.ServiceSupportResponse;
-import org.mouji.common.info.responses.TextResponse;
+import org.lessrpc.stub.java.StubConstants;
+import org.lessrpc.common.errors.ApplicationSpecificErrorException;
+import org.lessrpc.common.errors.RPCException;
+import org.lessrpc.common.errors.RPCProviderFailureException;
+import org.lessrpc.common.errors.ResponseContentTypeCannotBePrasedException;
+import org.lessrpc.common.errors.SerializationFormatNotSupported;
+import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceProviderInfo;
+import org.lessrpc.common.info.ServiceRequest;
+import org.lessrpc.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.responses.ExecuteRequestResponse;
+import org.lessrpc.common.info.responses.IntegerResponse;
+import org.lessrpc.common.info.responses.ProviderInfoResponse;
+import org.lessrpc.common.info.responses.RequestResponse;
+import org.lessrpc.common.info.responses.ServiceResponse;
+import org.lessrpc.common.info.responses.ServiceSupportResponse;
+import org.lessrpc.common.info.responses.TextResponse;
+import org.lessrpc.common.serializer.Serializer;
 
 /**
  * Simple client stub class used in Less-RPC that doesn't support a NameServer

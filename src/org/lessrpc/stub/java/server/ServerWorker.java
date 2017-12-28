@@ -1,9 +1,8 @@
-package org.mouji.stub.java.server;
+package org.lessrpc.stub.java.server;
 
 import java.net.Socket;
 
-
-import org.mouji.common.serializer.Serializer;
+import org.lessrpc.common.serializer.Serializer;
 
 /**
  * Runnable class used to handle requests in multithread StreamServer. It will

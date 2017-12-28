@@ -1,4 +1,4 @@
-package org.mouji.stub.java;
+package org.lessrpc.stub.java;
 
 public interface StubConstants {
 

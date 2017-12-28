@@ -1,8 +1,8 @@
-package org.mouji.stub.java.cache;
+package org.lessrpc.stub.java.cache;
 
 import java.util.HashMap;
 
-import org.mouji.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.ServiceSupportInfo;
 
 /**
  * Simply keeps one instance of the provider per cache

@@ -1,6 +1,6 @@
-package org.mouji.stub.java.cache;
+package org.lessrpc.stub.java.cache;
 
-import org.mouji.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.ServiceSupportInfo;
 
 /**
  * This cache implementation just doesn't do anything. It works as nothing is

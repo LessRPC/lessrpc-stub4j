@@ -1,5 +1,5 @@
 
-package org.mouji.stub.java.stubs;
+package org.lessrpc.stub.java.stubs;
 
 import java.io.IOException;
 
@@ -10,31 +10,31 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.mouji.common.errors.AcceptTypeHTTPFormatNotParsable;
-import org.mouji.common.errors.AcceptTypeNotSupported;
-import org.mouji.common.errors.ApplicationSpecificErrorException;
-import org.mouji.common.errors.ContentTypeHTTPFormatNotParsable;
-import org.mouji.common.errors.ContentTypeNotSupported;
-import org.mouji.common.errors.ExecuteInternalError;
-import org.mouji.common.errors.InvalidArgsException;
-import org.mouji.common.errors.SerializationFormatHTTPNotParsable;
-import org.mouji.common.errors.ServiceNotSupportedException;
-import org.mouji.common.errors.UnderterminableCodeException;
-import org.mouji.common.errors.WrongHTTPMethodException;
-import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.info.ServiceInfo;
-import org.mouji.common.info.ServiceRequest;
-import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.responses.ExecuteRequestResponse;
-import org.mouji.common.info.responses.IntegerResponse;
-import org.mouji.common.info.responses.ProviderInfoResponse;
-import org.mouji.common.info.responses.ServiceResponse;
-import org.mouji.common.info.responses.ServiceSupportResponse;
-import org.mouji.common.info.responses.TextResponse;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.common.services.ServiceProvider;
-import org.mouji.common.types.StatusType;
-import org.mouji.stub.java.StubConstants;
+import org.lessrpc.stub.java.StubConstants;
+import org.lessrpc.common.errors.AcceptTypeHTTPFormatNotParsable;
+import org.lessrpc.common.errors.AcceptTypeNotSupported;
+import org.lessrpc.common.errors.ApplicationSpecificErrorException;
+import org.lessrpc.common.errors.ContentTypeHTTPFormatNotParsable;
+import org.lessrpc.common.errors.ContentTypeNotSupported;
+import org.lessrpc.common.errors.ExecuteInternalError;
+import org.lessrpc.common.errors.InvalidArgsException;
+import org.lessrpc.common.errors.SerializationFormatHTTPNotParsable;
+import org.lessrpc.common.errors.ServiceNotSupportedException;
+import org.lessrpc.common.errors.UnderterminableCodeException;
+import org.lessrpc.common.errors.WrongHTTPMethodException;
+import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceRequest;
+import org.lessrpc.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.responses.ExecuteRequestResponse;
+import org.lessrpc.common.info.responses.IntegerResponse;
+import org.lessrpc.common.info.responses.ProviderInfoResponse;
+import org.lessrpc.common.info.responses.ServiceResponse;
+import org.lessrpc.common.info.responses.ServiceSupportResponse;
+import org.lessrpc.common.info.responses.TextResponse;
+import org.lessrpc.common.serializer.Serializer;
+import org.lessrpc.common.services.ServiceProvider;
+import org.lessrpc.common.types.StatusType;
 
 public class SPServiceHandler extends AbstractHandler implements StubConstants {
 

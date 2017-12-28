@@ -1,24 +1,23 @@
 package test.java.stub;
 
-import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.info.SerializedObject;
-import org.mouji.common.info.ServiceInfo;
-import org.mouji.common.info.ServiceProviderInfo;
-import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.EnvironmentInfo;
-import org.mouji.common.info.responses.ExecuteRequestResponse;
-import org.mouji.common.info.responses.IntegerResponse;
-import org.mouji.common.info.responses.ProviderInfoResponse;
-import org.mouji.common.info.responses.ServiceResponse;
-import org.mouji.common.info.responses.ServiceSupportResponse;
-import org.mouji.common.info.responses.TextResponse;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.stub.java.serializer.JsonSerializer;
-
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lessrpc.stub.java.serializer.JsonSerializer;
+import org.lessrpc.common.info.EnvironmentInfo;
+import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.info.SerializedObject;
+import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceProviderInfo;
+import org.lessrpc.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.responses.ExecuteRequestResponse;
+import org.lessrpc.common.info.responses.IntegerResponse;
+import org.lessrpc.common.info.responses.ProviderInfoResponse;
+import org.lessrpc.common.info.responses.ServiceResponse;
+import org.lessrpc.common.info.responses.ServiceSupportResponse;
+import org.lessrpc.common.info.responses.TextResponse;
+import org.lessrpc.common.serializer.Serializer;
 
 public class JsonSerializerTest {
 

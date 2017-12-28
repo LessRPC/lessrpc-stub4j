@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>moujistub4j</artifactId>
+	<artifactId>lessrpc-stub4j</artifactId>
 	<packaging>jar</packaging>
 
-	<name>moujistub4j</name>
+	<name>lessrpc-stub4j</name>
 
 	<parent>
-		<groupId>org.mouji</groupId>
-		<artifactId>moujiparent</artifactId>
+		<groupId>org.lessrpc</groupId>
+		<artifactId>lessrpc-parent</artifactId>
 		<version>0.1.0</version>
 		<relativePath>../</relativePath>
 	</parent>
@@ -34,8 +34,8 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.mouji</groupId>
-			<artifactId>moujicommon</artifactId>
+			<groupId>org.lessrpc</groupId>
+			<artifactId>lessrpc-common</artifactId>
 			<version>0.1.0</version>
 			<scope>compile</scope>
 		</dependency>

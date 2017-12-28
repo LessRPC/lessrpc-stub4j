@@ -1,7 +1,7 @@
-package org.mouji.stub.java.cache;
+package org.lessrpc.stub.java.cache;
 
-import org.mouji.common.info.ServiceInfo;
-import org.mouji.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceSupportInfo;
 
 /**
  * Abstract ServiceProvider Cache

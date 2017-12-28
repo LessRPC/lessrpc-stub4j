@@ -1,12 +1,12 @@
-package org.mouji.stub.java.stubs;
+package org.lessrpc.stub.java.stubs;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.stub.java.serializer.JsonSerializer;
+import org.lessrpc.stub.java.serializer.JsonSerializer;
+import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.serializer.Serializer;
 
 /**
  * Basic stub class that provides common functionalities between server stub and

@@ -1,22 +1,22 @@
-package org.mouji.stub.java.stubs;
+package org.lessrpc.stub.java.stubs;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.mouji.common.errors.DatabaseNotSupported;
-import org.mouji.common.errors.RPCException;
-import org.mouji.common.errors.RPCProviderFailureException;
-import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
-import org.mouji.common.errors.SerializationFormatNotSupported;
-import org.mouji.common.info.ServiceInfo;
-import org.mouji.common.info.ServiceProviderInfo;
-import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.responses.ServiceResponse;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.common.services.NameServerFunctions;
-import org.mouji.common.services.NameServerServices;
-import org.mouji.stub.java.serializer.JsonSerializer;
+import org.lessrpc.stub.java.serializer.JsonSerializer;
+import org.lessrpc.common.errors.DatabaseNotSupported;
+import org.lessrpc.common.errors.RPCException;
+import org.lessrpc.common.errors.RPCProviderFailureException;
+import org.lessrpc.common.errors.ResponseContentTypeCannotBePrasedException;
+import org.lessrpc.common.errors.SerializationFormatNotSupported;
+import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceProviderInfo;
+import org.lessrpc.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.responses.ServiceResponse;
+import org.lessrpc.common.serializer.Serializer;
+import org.lessrpc.common.services.NameServerFunctions;
+import org.lessrpc.common.services.NameServerServices;
 
 public class NSClient extends ClientStub implements NameServerServices, NameServerFunctions {
 

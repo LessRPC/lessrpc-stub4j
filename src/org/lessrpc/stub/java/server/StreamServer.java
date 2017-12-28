@@ -1,4 +1,4 @@
-package org.mouji.stub.java.server;
+package org.lessrpc.stub.java.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.mouji.common.serializer.Serializer;
+import org.lessrpc.common.serializer.Serializer;
 
 /**
  * StreamServer class for RPC. This class creates a mutlithread pooled server

@@ -1,10 +1,10 @@
-package org.mouji.stub.java.serializer;
+package org.lessrpc.stub.java.serializer;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.serializer.Serializer;
+import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.serializer.Serializer;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.Module;

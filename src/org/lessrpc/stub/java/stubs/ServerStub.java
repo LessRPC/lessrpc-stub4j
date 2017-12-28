@@ -1,13 +1,13 @@
-package org.mouji.stub.java.stubs;
+package org.lessrpc.stub.java.stubs;
 
 import java.util.List;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.mouji.common.errors.ServerStubNotInitialized;
-import org.mouji.common.info.SerializationFormat;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.common.services.ServiceProvider;
+import org.lessrpc.common.errors.ServerStubNotInitialized;
+import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.serializer.Serializer;
+import org.lessrpc.common.services.ServiceProvider;
 
 public class ServerStub extends Stub {
 

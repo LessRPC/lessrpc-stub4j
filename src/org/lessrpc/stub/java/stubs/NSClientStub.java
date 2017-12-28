@@ -1,21 +1,21 @@
-package org.mouji.stub.java.stubs;
+package org.lessrpc.stub.java.stubs;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.mouji.common.errors.RPCException;
-import org.mouji.common.errors.RPCProviderFailureException;
-import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
-import org.mouji.common.errors.SerializationFormatNotSupported;
-import org.mouji.common.errors.ServiceProviderNotAvailable;
-import org.mouji.common.info.ServiceInfo;
-import org.mouji.common.info.ServiceProviderInfo;
-import org.mouji.common.info.ServiceSupportInfo;
-import org.mouji.common.info.responses.ServiceResponse;
-import org.mouji.common.serializer.Serializer;
-import org.mouji.stub.java.StubConstants;
-import org.mouji.stub.java.cache.ServiceProviderCache;
-import org.mouji.stub.java.errors.NoProviderAvailableException;
+import org.lessrpc.stub.java.StubConstants;
+import org.lessrpc.stub.java.cache.ServiceProviderCache;
+import org.lessrpc.stub.java.errors.NoProviderAvailableException;
+import org.lessrpc.common.errors.RPCException;
+import org.lessrpc.common.errors.RPCProviderFailureException;
+import org.lessrpc.common.errors.ResponseContentTypeCannotBePrasedException;
+import org.lessrpc.common.errors.SerializationFormatNotSupported;
+import org.lessrpc.common.errors.ServiceProviderNotAvailable;
+import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceProviderInfo;
+import org.lessrpc.common.info.ServiceSupportInfo;
+import org.lessrpc.common.info.responses.ServiceResponse;
+import org.lessrpc.common.serializer.Serializer;
 
 public class NSClientStub extends ClientStub implements StubConstants {
 
