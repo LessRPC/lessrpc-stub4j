@@ -16,6 +16,7 @@ import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.client.util.OutputStreamContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
 import org.mouji.common.serializer.Serializer;
+import org.mouji.common.errors.ApplicationSpecificErrorException;
 import org.mouji.common.errors.RPCException;
 import org.mouji.common.errors.RPCProviderFailureException;
 import org.mouji.common.errors.ResponseContentTypeCannotBePrasedException;
@@ -252,7 +253,11 @@ public class ClientStub extends Stub implements StubConstants {
 		// checking status
 		if (response.getStatus() != HttpServletResponse.SC_OK) {
 			TextResponse error = readError(listener, serializer);
-			throw new RPCException(error.getStatus(), error.getContent());
+			if (error.getStatus() > 3000) {
+				throw new ApplicationSpecificErrorException(error.getStatus(), error.getContent());
+			} else {
+				throw new RPCException(error.getStatus(), error.getContent());
+			}
 		}
 
 		// status is OK so read response
