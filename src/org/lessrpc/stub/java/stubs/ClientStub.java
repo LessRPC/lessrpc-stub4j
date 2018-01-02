@@ -225,7 +225,7 @@ public class ClientStub extends Stub implements StubConstants {
 					RPCException, RPCProviderFailureException, IOException, Exception {
 
 		// Wait for the response headers to arrive
-		Response response = listener.get(5, TimeUnit.SECONDS);
+		Response response = listener.get(timeout, TimeUnit.SECONDS);
 
 		String contentType = response.getHeaders().get("Content-type");
 
