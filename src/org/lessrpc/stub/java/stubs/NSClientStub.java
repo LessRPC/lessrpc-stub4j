@@ -82,7 +82,7 @@ public class NSClientStub extends ClientStub implements StubConstants {
 		} catch (RPCProviderFailureException | IOException e) {
 			// a connectivity error happened. So try to find a new Provider
 			// clear cache
-			cache.clearCache(service);
+			cache.clear(service);
 			// check if provider still works
 			ns.checkProviderStatus(provider);
 			// call again and it will ask for a provider from NameServer

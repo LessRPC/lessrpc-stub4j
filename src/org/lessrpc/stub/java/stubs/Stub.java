@@ -38,7 +38,7 @@ public class Stub {
 		this.serializerMap = new HashMap<SerializationFormat, Serializer>();
 		for (Serializer serializer : serializers) {
 			serializerMap.put(serializer.getType(), serializer);
-			if (serializer.getType().getName().equals("json")) {
+			if (serializer.getType().getName().toLowerCase().equals("json")) {
 				hasJson = true;
 			}
 		}

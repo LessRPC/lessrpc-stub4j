@@ -68,7 +68,6 @@ public class ClientStub extends Stub implements StubConstants {
 
 		client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_PING)
 				.method(HttpMethod.GET).accept(getAcceptedTypes()).send(listener);
-
 		IntegerResponse ping = null;
 		try {
 			ping = readResponse(listener, IntegerResponse.class, HTTP_WAIT_TIME_SHORT);
@@ -196,7 +195,7 @@ public class ClientStub extends Stub implements StubConstants {
 			output.flush();
 			output.close();
 
-			execResponse = readResponse(listener, ExecuteRequestResponse.class, HTTP_WAIT_TIME_SHORT);
+			execResponse = readResponse(listener, ExecuteRequestResponse.class, HTTP_WAIT_TIME_LONG);
 		}
 
 		client.stop();
@@ -227,6 +226,8 @@ public class ClientStub extends Stub implements StubConstants {
 		// Wait for the response headers to arrive
 		Response response = listener.get(timeout, TimeUnit.SECONDS);
 
+		//TODO handle response status 404, 200 and etc..
+		
 		String contentType = response.getHeaders().get("Content-type");
 
 		if (contentType == null || contentType.length() < 1) {
@@ -281,7 +282,6 @@ public class ClientStub extends Stub implements StubConstants {
 	 */
 	private TextResponse readError(InputStreamResponseListener listener, Serializer serializer)
 			throws RPCProviderFailureException {
-		// status is OK so read response
 		// Use try-with-resources to close input stream.
 		try {
 			try (InputStream responseContent = listener.getInputStream()) {

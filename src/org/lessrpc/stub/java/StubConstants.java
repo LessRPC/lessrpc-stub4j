@@ -13,7 +13,7 @@ public interface StubConstants {
 	public static final String LESS_RPC_REQUEST_INFO = "/info";
 
 	public static final String HTTP_PROTOCOL = "http://";
-	public static final String HTTPS_PROTOCOL = "http://";
+	public static final String HTTPS_PROTOCOL = "https://";
 
 	public static final long HTTP_WAIT_TIME_SHORT = 5;
 

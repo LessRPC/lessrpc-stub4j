@@ -55,7 +55,7 @@ public abstract class ServiceProviderCache {
 	 * 
 	 * @param service
 	 */
-	public abstract void clearCache(int serviceId);
+	public abstract void clear(int serviceId);
 
 	/**
 	 * 
@@ -63,8 +63,8 @@ public abstract class ServiceProviderCache {
 	 * 
 	 * @param service
 	 */
-	public void clearCache(ServiceInfo<?> service) {
-		clearCache(service.getId());
+	public void clear(ServiceInfo<?> service) {
+		clear(service.getId());
 	}
 	
 	public abstract void reset();

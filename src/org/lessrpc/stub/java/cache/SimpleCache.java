@@ -32,7 +32,7 @@ public class SimpleCache extends ServiceProviderCache {
 	}
 
 	@Override
-	public void clearCache(int serviceId) {
+	public void clear(int serviceId) {
 		map.remove(serviceId);
 	}
 

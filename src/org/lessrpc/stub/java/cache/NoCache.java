@@ -24,7 +24,7 @@ public class NoCache extends ServiceProviderCache {
 	}
 
 	@Override
-	public void clearCache(int serviceId) {
+	public void clear(int serviceId) {
 		// DO NOTHING
 	}
 

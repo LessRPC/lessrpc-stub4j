@@ -1,7 +1,10 @@
 
 package org.lessrpc.stub.java.stubs;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -106,10 +109,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			response.setContentType(SerializationFormat.defaultFotmat().httpFormat());
 			sendStatus(StatusType.ACCEPT_TYPE_CANNOT_BE_PARSED, baseRequest, response,
 					SerializationFormat.defaultFotmat());
+			return;
 		} catch (AcceptTypeNotSupported e) {
 			response.setContentType(SerializationFormat.defaultFotmat().httpFormat());
 			sendStatus(StatusType.ACCEPT_TYPE_NOT_SUPPORTED, baseRequest, response,
 					SerializationFormat.defaultFotmat());
+			return;
 		}
 		// setting response serialization format regardless if there is an error
 		// or successful attempt
@@ -126,9 +131,13 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		try {
 			requestSerializer = parseContentType(target, baseRequest, request, response, inputRequired);
 		} catch (ContentTypeHTTPFormatNotParsable e) {
+			response.setContentType(SerializationFormat.defaultFotmat().httpFormat());
 			sendStatus(StatusType.CONTENT_TYPE_CANNOT_BE_PARSED, baseRequest, response, responseSerializer.getType());
+			return;
 		} catch (ContentTypeNotSupported e) {
+			response.setContentType(SerializationFormat.defaultFotmat().httpFormat());
 			sendStatus(StatusType.CONTENT_TYPE_NOT_SUPPORTED, baseRequest, response, responseSerializer.getType());
+			return;
 		}
 
 		response.setContentType(responseSerializer.getType().httpFormat());
@@ -199,6 +208,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		try {
 			formats = parseAcceptedFormats(request);
 		} catch (Exception e) {
+			throw new AcceptTypeHTTPFormatNotParsable(acceptType);
+		}
+		
+		if (formats == null || formats.length == 0) {
+			//TODO add AcceptType not available error
 			throw new AcceptTypeHTTPFormatNotParsable(acceptType);
 		}
 
@@ -308,7 +322,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		}
 
 		try {
-			info = requestSerializer.deserialize(is, ServiceInfo.class);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			String str = reader.readLine();
+			System.out.println(str);
+			ByteArrayInputStream in = new ByteArrayInputStream(str.getBytes());
+			info = requestSerializer.deserialize(in, ServiceInfo.class);
 		} catch (Exception e) {
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
@@ -357,6 +375,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 		// setting request as handled
 		baseRequest.setHandled(true);
+		response.flushBuffer();
 	}
 
 	public SerializationFormat[] parseAcceptedFormats(HttpServletRequest request)
