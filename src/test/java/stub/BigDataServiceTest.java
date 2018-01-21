@@ -11,7 +11,7 @@ import org.lessrpc.common.errors.InvalidArgsException;
 import org.lessrpc.common.errors.ServiceNotSupportedException;
 import org.lessrpc.common.info.EnvironmentInfo;
 import org.lessrpc.common.info.SerializationFormat;
-import org.lessrpc.common.info.SerializedObject;
+import org.lessrpc.common.info.ServiceDescription;
 import org.lessrpc.common.info.ServiceInfo;
 import org.lessrpc.common.info.ServiceProviderInfo;
 import org.lessrpc.common.info.ServiceRequest;
@@ -36,7 +36,7 @@ public class BigDataServiceTest {
 
 	private static final int serverPort = 4040;
 
-	private static ClientStub clientStub;
+	protected static ClientStub clientStub;
 
 	private static ServiceInfo<Integer> service;
 
@@ -51,13 +51,14 @@ public class BigDataServiceTest {
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
 
-		serverStub = new ServerStub(serverPort,list);
+		serverStub = new ServerStub(serverPort, list);
 
 		ServiceProvider serviceProvider = new ServiceProvider() {
 
 			@Override
 			public ServiceSupportInfo service(ServiceInfo<?> info) throws ServiceNotSupportedException {
-				return new ServiceSupportInfo(info, spInfo, new SerializationFormat[] { SerializationFormat.defaultFotmat() });
+				return new ServiceSupportInfo(info, spInfo,
+						new SerializationFormat[] { SerializationFormat.defaultFotmat() });
 			}
 
 			@Override
@@ -74,13 +75,12 @@ public class BigDataServiceTest {
 			public ServiceResponse<?> execute(ServiceRequest request) throws ApplicationSpecificErrorException,
 					ExecuteInternalError, InvalidArgsException, ServiceNotSupportedException {
 				if (request.getService().getId() == 1) {
-					if (!(request.getArgs()[0].getContent() instanceof Integer)
-							|| !(request.getArgs()[1].getContent() instanceof Integer)) {
+					if (!(request.getArgs()[0] instanceof Integer) || !(request.getArgs()[1] instanceof Integer)) {
 						throw new InvalidArgsException("Both must be integers!!");
 					}
-					double[][] data = (double[][]) request.getArgs()[0].getContent();
-					return new ServiceResponse<>(request.getService(),
-							new SerializedObject<>(new Long(data.length * data[0].length)), request.getRequestId());
+					double[][] data = (double[][]) request.getArgs()[0];
+					return new ServiceResponse<>(request.getService(), new Long(data.length * data[0].length),
+							request.getRequestId());
 				} else {
 					throw new ServiceNotSupportedException(request.getService());
 				}
@@ -89,7 +89,17 @@ public class BigDataServiceTest {
 			@Override
 			public List<ServiceSupportInfo> listSupport() {
 				List<ServiceSupportInfo> list = new ArrayList<ServiceSupportInfo>();
-				list.add(new ServiceSupportInfo(service, spInfo, new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
+				list.add(new ServiceSupportInfo(service, spInfo,
+						new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
+				return list;
+			}
+
+			@SuppressWarnings("rawtypes")
+			@Override
+			public List<ServiceDescription> listServices() {
+				List<ServiceDescription> list = new ArrayList<ServiceDescription>();
+				list.add(
+						new ServiceDescription<>(service, new Class[] { Integer.class, Integer.class }, Integer.class));
 				return list;
 			}
 		};
@@ -103,22 +113,23 @@ public class BigDataServiceTest {
 	}
 
 	public void testExecute() throws Exception {
-		
+
 		double[][] data = generateNumericData(1000, 100000, 100000000, 1000000000, false);
 		JsonSerializer ser = new JsonSerializer();
-		byte[] bytes = 	ser.serialize(data, double[][].class);
-		
-//		ServiceResponse<Integer> response = clientStub.call(service, spInfo, new Integer[] { 4, 5 },
-//				new JsonSerializer());
-//
-//		// checking service information
-//		assertEquals(service, response.getService());
-//		//
-//		// checking class of result
-//		assertEquals(Integer.class, response.getContent().getClass());
-//
-//		// value of results to be equal
-//		assertEquals(new Boolean(true), response.getContent());
+		byte[] bytes = ser.serialize(data, double[][].class);
+
+		// ServiceResponse<Integer> response = clientStub.call(service, spInfo,
+		// new Integer[] { 4, 5 },
+		// new JsonSerializer());
+		//
+		// // checking service information
+		// assertEquals(service, response.getService());
+		// //
+		// // checking class of result
+		// assertEquals(Integer.class, response.getContent().getClass());
+		//
+		// // value of results to be equal
+		// assertEquals(new Boolean(true), response.getContent());
 	}
 
 	@AfterClass

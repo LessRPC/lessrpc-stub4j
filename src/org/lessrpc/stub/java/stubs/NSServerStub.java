@@ -39,9 +39,7 @@ public class NSServerStub extends ServerStub {
 	protected void beforeStop() throws ClassNotFoundException, SQLException, DatabaseNotSupported,
 			ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported, RPCException,
 			RPCProviderFailureException, IOException, Exception {
-		for (ServiceSupportInfo support : getProvider().listSupport()) {
-			ns.unregisterAll(support.getProvider());
-		}
+		ns.unregisterAll(getProvider().info());
 	}
 
 }

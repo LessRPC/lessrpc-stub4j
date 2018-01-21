@@ -11,6 +11,7 @@ import org.lessrpc.common.errors.RPCProviderFailureException;
 import org.lessrpc.common.errors.ResponseContentTypeCannotBePrasedException;
 import org.lessrpc.common.errors.SerializationFormatNotSupported;
 import org.lessrpc.common.errors.ServiceProviderNotAvailable;
+import org.lessrpc.common.info.ServiceDescription;
 import org.lessrpc.common.info.ServiceInfo;
 import org.lessrpc.common.info.ServiceProviderInfo;
 import org.lessrpc.common.info.ServiceSupportInfo;
@@ -30,7 +31,7 @@ public class NSClientStub extends ClientStub implements StubConstants {
 
 	public NSClientStub(ServiceProviderInfo nsInfo, ServiceProviderCache cache, List<Serializer> serializers) {
 		super(serializers);
-		this.setNsInfo(nsInfo);
+		this.nsInfo = nsInfo;
 		this.cache = cache;
 		this.ns = new NSClient(nsInfo, serializers);
 	}
@@ -63,14 +64,14 @@ public class NSClientStub extends ClientStub implements StubConstants {
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public <T> ServiceResponse<T> call(ServiceInfo<T> service, Object[] args, Serializer serializer)
+	public <T> ServiceResponse<T> call(ServiceDescription<T> service, Object[] args, Serializer serializer)
 			throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported, RPCException,
 			RPCProviderFailureException, IOException, Exception {
 
-		ServiceProviderInfo provider = getProvider(service).getProvider();
+		ServiceProviderInfo provider = getProvider(service.getInfo()).getProvider();
 		if (provider == null) {
 			// no provider existed so throw appropriate Exception
-			throw new NoProviderAvailableException(service);
+			throw new NoProviderAvailableException(service.getInfo());
 		}
 		// provider existed so try to connect
 		ServiceResponse<T> response = null;
@@ -82,7 +83,7 @@ public class NSClientStub extends ClientStub implements StubConstants {
 		} catch (RPCProviderFailureException | IOException e) {
 			// a connectivity error happened. So try to find a new Provider
 			// clear cache
-			cache.clear(service);
+			cache.clear(service.getInfo());
 			// check if provider still works
 			ns.checkProviderStatus(provider);
 			// call again and it will ask for a provider from NameServer
@@ -138,8 +139,5 @@ public class NSClientStub extends ClientStub implements StubConstants {
 		return nsInfo;
 	}
 
-	public void setNsInfo(ServiceProviderInfo nsInfo) {
-		this.nsInfo = nsInfo;
-	}
 
 }

@@ -18,7 +18,7 @@ import org.lessrpc.common.errors.InvalidArgsException;
 import org.lessrpc.common.errors.ServiceNotSupportedException;
 import org.lessrpc.common.info.EnvironmentInfo;
 import org.lessrpc.common.info.SerializationFormat;
-import org.lessrpc.common.info.SerializedObject;
+import org.lessrpc.common.info.ServiceDescription;
 import org.lessrpc.common.info.ServiceInfo;
 import org.lessrpc.common.info.ServiceProviderInfo;
 import org.lessrpc.common.info.ServiceRequest;
@@ -43,6 +43,7 @@ public class SimpleStubsRunningTest {
 	private static ClientStub clientStub;
 
 	private static ServiceInfo<Integer> service;
+	private static ServiceDescription<Integer> desc;
 
 	@BeforeClass
 	public static void initStubs() throws Exception {
@@ -51,6 +52,8 @@ public class SimpleStubsRunningTest {
 
 		// setting service
 		service = new ServiceInfo<Integer>("add", 1);
+
+		desc = new ServiceDescription<>(service, new Class[] { Integer.class, Integer.class }, Integer.class);
 
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
@@ -79,14 +82,12 @@ public class SimpleStubsRunningTest {
 			public ServiceResponse<?> execute(ServiceRequest request) throws ApplicationSpecificErrorException,
 					ExecuteInternalError, InvalidArgsException, ServiceNotSupportedException {
 				if (request.getService().getId() == 1) {
-					if (!(request.getArgs()[0].getContent() instanceof Integer)
-							|| !(request.getArgs()[1].getContent() instanceof Integer)) {
+					if (!(request.getArgs()[0] instanceof Integer) || !(request.getArgs()[1] instanceof Integer)) {
 						throw new InvalidArgsException("Both must be integers!!");
 					}
-					Integer num1 = (Integer) request.getArgs()[0].getContent();
-					Integer num2 = (Integer) request.getArgs()[1].getContent();
-					return new ServiceResponse<>(request.getService(), new SerializedObject<>(num1 + num2),
-							request.getRequestId());
+					Integer num1 = (Integer) request.getArgs()[0];
+					Integer num2 = (Integer) request.getArgs()[1];
+					return new ServiceResponse<>(request.getService(), num1 + num2, request.getRequestId());
 				} else {
 					throw new ServiceNotSupportedException(request.getService());
 				}
@@ -97,6 +98,15 @@ public class SimpleStubsRunningTest {
 				List<ServiceSupportInfo> list = new ArrayList<ServiceSupportInfo>();
 				list.add(new ServiceSupportInfo(service, spInfo,
 						new SerializationFormat[] { SerializationFormat.defaultFotmat() }));
+				return list;
+			}
+
+			@SuppressWarnings("rawtypes")
+			@Override
+			public List<ServiceDescription> listServices() {
+				List<ServiceDescription> list = new ArrayList<ServiceDescription>();
+				list.add(
+						new ServiceDescription<>(service, new Class[] { Integer.class, Integer.class }, Integer.class));
 				return list;
 			}
 		};
@@ -132,13 +142,10 @@ public class SimpleStubsRunningTest {
 		// // checking format information
 		assertEquals(support.getSerializers()[0], SerializationFormat.defaultFotmat());
 	}
-	
-
 
 	@Test
 	public void testExecute() throws Exception {
-		ServiceResponse<Integer> response = clientStub.call(service, spInfo, new Integer[] { 4, 5 },
-				new JsonSerializer());
+		ServiceResponse<Integer> response = clientStub.call(desc, spInfo, new Integer[] { 4, 5 }, new JsonSerializer());
 
 		// checking service information
 		assertEquals(service, response.getService());
@@ -149,8 +156,6 @@ public class SimpleStubsRunningTest {
 		// value of results to be equal
 		assertEquals(new Integer(9), response.getContent());
 	}
-	
-	
 
 	@AfterClass
 	public static void closeAfterTests() {
@@ -160,7 +165,5 @@ public class SimpleStubsRunningTest {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 }

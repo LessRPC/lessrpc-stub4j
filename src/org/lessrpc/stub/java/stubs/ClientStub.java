@@ -21,7 +21,9 @@ import org.lessrpc.common.errors.RPCProviderFailureException;
 import org.lessrpc.common.errors.ResponseContentTypeCannotBePrasedException;
 import org.lessrpc.common.errors.SerializationFormatNotSupported;
 import org.lessrpc.common.info.SerializationFormat;
+import org.lessrpc.common.info.ServiceDescription;
 import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceLocator;
 import org.lessrpc.common.info.ServiceProviderInfo;
 import org.lessrpc.common.info.ServiceRequest;
 import org.lessrpc.common.info.ServiceSupportInfo;
@@ -60,7 +62,6 @@ public class ClientStub extends Stub implements StubConstants {
 	 */
 	public boolean ping(ServiceProviderInfo info) throws Exception {
 		boolean flag = true;
-
 		HttpClient client = new HttpClient();
 		client.start();
 
@@ -70,7 +71,7 @@ public class ClientStub extends Stub implements StubConstants {
 				.method(HttpMethod.GET).accept(getAcceptedTypes()).send(listener);
 		IntegerResponse ping = null;
 		try {
-			ping = readResponse(listener, IntegerResponse.class, HTTP_WAIT_TIME_SHORT);
+			ping = readResponse(listener, IntegerResponse.class, null, HTTP_WAIT_TIME_SHORT);
 		} catch (ResponseContentTypeCannotBePrasedException e) {
 			throw e;
 		} catch (SerializationFormatNotSupported e) {
@@ -117,7 +118,8 @@ public class ClientStub extends Stub implements StubConstants {
 		client.newRequest(HTTP_PROTOCOL + url + ":" + port + LESS_RPC_REQUEST_INFO).method(HttpMethod.GET)
 				.accept(getAcceptedTypes()).send(listener);
 
-		ProviderInfoResponse infoResponse = readResponse(listener, ProviderInfoResponse.class, HTTP_WAIT_TIME_SHORT);
+		ProviderInfoResponse infoResponse = readResponse(listener, ProviderInfoResponse.class, null,
+				HTTP_WAIT_TIME_SHORT);
 
 		client.stop();
 
@@ -145,7 +147,7 @@ public class ClientStub extends Stub implements StubConstants {
 				.header("content-type", SerializationFormat.defaultFotmat().httpFormat())
 				.content(new BytesContentProvider(serializer.serialize(service, ServiceInfo.class))).send(listener);
 
-		ServiceSupportResponse supportResponse = readResponse(listener, ServiceSupportResponse.class,
+		ServiceSupportResponse supportResponse = readResponse(listener, ServiceSupportResponse.class, null,
 				HTTP_WAIT_TIME_SHORT);
 
 		client.stop();
@@ -169,11 +171,11 @@ public class ClientStub extends Stub implements StubConstants {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> ServiceResponse<T> call(ServiceInfo<T> service, ServiceProviderInfo info, Object[] args,
+	public <T> ServiceResponse<T> call(ServiceDescription<T> service, ServiceProviderInfo info, Object[] args,
 			Serializer serializer) throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported,
 					RPCException, RPCProviderFailureException, IOException, Exception {
 
-		ServiceRequest request = ServiceRequest.create(service, genRandomId(), args);
+		ServiceRequest request = ServiceRequest.create(service.getInfo(), genRandomId(), args);
 
 		HttpClient client = new HttpClient();
 		client.start();
@@ -195,7 +197,7 @@ public class ClientStub extends Stub implements StubConstants {
 			output.flush();
 			output.close();
 
-			execResponse = readResponse(listener, ExecuteRequestResponse.class, HTTP_WAIT_TIME_LONG);
+			execResponse = readResponse(listener, ExecuteRequestResponse.class, service, HTTP_WAIT_TIME_LONG);
 		}
 
 		client.stop();
@@ -220,14 +222,14 @@ public class ClientStub extends Stub implements StubConstants {
 	 * @throws Exception
 	 */
 	protected <T extends RequestResponse<?>> T readResponse(InputStreamResponseListener listener, Class<T> cls,
-			long timeout) throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported,
-					RPCException, RPCProviderFailureException, IOException, Exception {
+			ServiceDescription<?> desc, long timeout) throws ResponseContentTypeCannotBePrasedException,
+					SerializationFormatNotSupported, RPCException, RPCProviderFailureException, IOException, Exception {
 
 		// Wait for the response headers to arrive
 		Response response = listener.get(timeout, TimeUnit.SECONDS);
 
-		//TODO handle response status 404, 200 and etc..
-		
+		// TODO handle response status 404, 200 and etc..
+
 		String contentType = response.getHeaders().get("Content-type");
 
 		if (contentType == null || contentType.length() < 1) {
@@ -267,7 +269,11 @@ public class ClientStub extends Stub implements StubConstants {
 			// byte[] bytes = new
 			// Scanner(responseContent).useDelimiter("\\Z").next().getBytes();
 			// System.out.println(new String(bytes));
-			return serializer.deserialize(responseContent, cls);
+			if (desc != null)
+				return serializer.deserialize(responseContent, cls, ServiceLocator.create(desc));
+			else
+				return serializer.deserialize(responseContent, cls);
+
 		}
 
 	}

@@ -27,6 +27,7 @@ import org.lessrpc.common.errors.UnderterminableCodeException;
 import org.lessrpc.common.errors.WrongHTTPMethodException;
 import org.lessrpc.common.info.SerializationFormat;
 import org.lessrpc.common.info.ServiceInfo;
+import org.lessrpc.common.info.ServiceLocator;
 import org.lessrpc.common.info.ServiceRequest;
 import org.lessrpc.common.info.ServiceSupportInfo;
 import org.lessrpc.common.info.responses.ExecuteRequestResponse;
@@ -60,7 +61,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_SERVICE)
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_INFO)
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_EXECUTE)) {
-			try {
+		try {
 				handleLessRPC(target, baseRequest, request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -125,6 +126,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			checkHTTPMethodType(target, baseRequest, request, response, inputRequired);
 		} catch (WrongHTTPMethodException e) {
 			sendStatus(StatusType.WRONG_HTTP_METHOD, baseRequest, response, responseSerializer.getType());
+			return;
 		}
 
 		// check if content-type exists and it is parsable and supported
@@ -141,6 +143,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		}
 
 		response.setContentType(responseSerializer.getType().httpFormat());
+		
 		// -------- start handling response
 		if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_PING)) {
 			handlePing(target, baseRequest, request, response, responseSerializer, requestSerializer);
@@ -149,7 +152,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		} else if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_INFO)) {
 			handleInfo(target, baseRequest, request, response, responseSerializer, requestSerializer);
 		} else if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_EXECUTE)) {
-			handleExecute(target, baseRequest, request, response, responseSerializer, requestSerializer);
+			handleExecute(target, baseRequest, request, response, responseSerializer, requestSerializer,
+					ServiceLocator.create(provider.listServices()));
 		} else {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			baseRequest.setHandled(true);
@@ -210,9 +214,9 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		} catch (Exception e) {
 			throw new AcceptTypeHTTPFormatNotParsable(acceptType);
 		}
-		
+
 		if (formats == null || formats.length == 0) {
-			//TODO add AcceptType not available error
+			// TODO add AcceptType not available error
 			throw new AcceptTypeHTTPFormatNotParsable(acceptType);
 		}
 
@@ -238,8 +242,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	}
 
 	private void handleExecute(String target, Request baseRequest, HttpServletRequest request,
-			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
-					throws Exception {
+			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer,
+			ServiceLocator locator) throws Exception {
 
 		// input to read
 		ServiceRequest serviceRequest = null;
@@ -255,7 +259,10 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			return;
 		}
 		try {
-			serviceRequest = requestSerializer.deserialize(is, ServiceRequest.class);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			String str = reader.readLine();
+			ByteArrayInputStream in = new ByteArrayInputStream(str.getBytes());
+			serviceRequest = requestSerializer.deserialize(in, ServiceRequest.class, locator);
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
@@ -281,7 +288,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
 		} catch (InvalidArgsException e) {
-			sendStatus(StatusType.INVALID_ARGS,e.getMessage(), baseRequest, response, responseSerializer.getType());
+			sendStatus(StatusType.INVALID_ARGS, e.getMessage(), baseRequest, response, responseSerializer.getType());
 			return;
 		} catch (ServiceNotSupportedException e) {
 			sendStatus(StatusType.SERVICE_NOT_SUPPORTED, baseRequest, response, responseSerializer.getType());
@@ -322,11 +329,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		}
 
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-			String str = reader.readLine();
-			System.out.println(str);
-			ByteArrayInputStream in = new ByteArrayInputStream(str.getBytes());
-			info = requestSerializer.deserialize(in, ServiceInfo.class);
+			info = requestSerializer.deserialize(is, ServiceInfo.class);
 		} catch (Exception e) {
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
@@ -366,6 +369,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			SerializationFormat format) throws Exception {
 		// setting status of http
 		response.setStatus(status.httpMatchingStatus());
+		
+		response.setContentType(format.httpFormat());
 
 		// sending output
 		Serializer serializer = stub.getSerializer(format);
