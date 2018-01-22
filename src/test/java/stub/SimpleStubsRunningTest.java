@@ -128,13 +128,12 @@ public class SimpleStubsRunningTest {
 	@Test
 	public void testInfo() throws Exception {
 		ServiceProviderInfo provider = clientStub.getInfo(spInfo.getURL(), spInfo.getPort());
-		assertEquals(provider, spInfo);
+		assertEquals(spInfo, provider);
 	}
 
 	@Test
 	public void testService() throws Exception {
 		ServiceSupportInfo support = clientStub.getServiceSupport(spInfo, service);
-
 		// checking service information
 		assertEquals(service, support.getService());
 		// // checking number of formats

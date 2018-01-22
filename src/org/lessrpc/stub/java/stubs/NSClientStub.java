@@ -11,6 +11,7 @@ import org.lessrpc.common.errors.RPCProviderFailureException;
 import org.lessrpc.common.errors.ResponseContentTypeCannotBePrasedException;
 import org.lessrpc.common.errors.SerializationFormatNotSupported;
 import org.lessrpc.common.errors.ServiceProviderNotAvailable;
+import org.lessrpc.common.info.SerializationFormat;
 import org.lessrpc.common.info.ServiceDescription;
 import org.lessrpc.common.info.ServiceInfo;
 import org.lessrpc.common.info.ServiceProviderInfo;
@@ -68,6 +69,29 @@ public class NSClientStub extends ClientStub implements StubConstants {
 			throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported, RPCException,
 			RPCProviderFailureException, IOException, Exception {
 
+		return this.call(service, args, serializer, null);
+	}
+
+	/**
+	 * calls execute service. It uses cached service provider or retrieves an
+	 * available provider from the name server
+	 * 
+	 * @param service
+	 * @param info
+	 * @param args
+	 * @param serializer
+	 * @return
+	 * @throws ResponseContentTypeCannotBePrasedException
+	 * @throws SerializationFormatNotSupported
+	 * @throws RPCException
+	 * @throws RPCProviderFailureException
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	public <T> ServiceResponse<T> call(ServiceDescription<T> service, Object[] args, Serializer serializer,
+			SerializationFormat[] accept) throws ResponseContentTypeCannotBePrasedException,
+					SerializationFormatNotSupported, RPCException, RPCProviderFailureException, IOException, Exception {
+
 		ServiceProviderInfo provider = getProvider(service.getInfo()).getProvider();
 		if (provider == null) {
 			// no provider existed so throw appropriate Exception
@@ -76,7 +100,7 @@ public class NSClientStub extends ClientStub implements StubConstants {
 		// provider existed so try to connect
 		ServiceResponse<T> response = null;
 		try {
-			response = call(service, provider, args, serializer);
+			response = call(service, provider, args, serializer, accept);
 		} catch (ResponseContentTypeCannotBePrasedException | RPCException | SerializationFormatNotSupported e) {
 			// none connectivity error happened
 			throw e;
@@ -138,6 +162,5 @@ public class NSClientStub extends ClientStub implements StubConstants {
 	public ServiceProviderInfo getNsInfo() {
 		return nsInfo;
 	}
-
 
 }

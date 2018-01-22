@@ -27,8 +27,6 @@ public class Stub {
 	 */
 	protected HashMap<SerializationFormat, Serializer> serializerMap;
 
-	private String acceptedTypeString = null;
-
 	public Stub(List<Serializer> serializers) {
 		boolean hasJson = false;
 
@@ -64,20 +62,27 @@ public class Stub {
 	/**
 	 * return http format string of accepted types
 	 * 
+	 * @param accept
+	 * 
 	 * @return
 	 */
-	protected String getAcceptedTypes() {
-		if (acceptedTypeString == null) {
-			StringBuilder sb = new StringBuilder();
+	protected String getAcceptedTypes(SerializationFormat[] accept) {
+
+		if (accept == null) {
+			accept = new SerializationFormat[getSerializers().size()];
 			for (int i = 0; i < getSerializers().size(); i++) {
-				sb.append(getSerializers().get(i).getType().httpFormat());
-				if (i != getSerializers().size() - 1) {
-					sb.append(" , ");
-				}
+				accept[i] = getSerializers().get(i).getType();
 			}
-			acceptedTypeString = sb.toString();
 		}
-		return acceptedTypeString;
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < accept.length; i++) {
+			sb.append(accept[i].httpFormat());
+			if (i != accept.length - 1) {
+				sb.append(" , ");
+			}
+		}
+		return sb.toString();
 	}
 
 	/**

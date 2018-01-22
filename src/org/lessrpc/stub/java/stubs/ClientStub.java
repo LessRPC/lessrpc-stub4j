@@ -68,7 +68,9 @@ public class ClientStub extends Stub implements StubConstants {
 		InputStreamResponseListener listener = new InputStreamResponseListener();
 
 		client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_PING)
-				.method(HttpMethod.GET).accept(getAcceptedTypes()).send(listener);
+				.method(HttpMethod.GET)
+				.accept(getAcceptedTypes(new SerializationFormat[] { SerializationFormat.defaultFotmat() }))
+				.send(listener);
 		IntegerResponse ping = null;
 		try {
 			ping = readResponse(listener, IntegerResponse.class, null, HTTP_WAIT_TIME_SHORT);
@@ -116,7 +118,8 @@ public class ClientStub extends Stub implements StubConstants {
 		InputStreamResponseListener listener = new InputStreamResponseListener();
 
 		client.newRequest(HTTP_PROTOCOL + url + ":" + port + LESS_RPC_REQUEST_INFO).method(HttpMethod.GET)
-				.accept(getAcceptedTypes()).send(listener);
+				.accept(getAcceptedTypes(new SerializationFormat[] { SerializationFormat.defaultFotmat() }))
+				.send(listener);
 
 		ProviderInfoResponse infoResponse = readResponse(listener, ProviderInfoResponse.class, null,
 				HTTP_WAIT_TIME_SHORT);
@@ -143,7 +146,8 @@ public class ClientStub extends Stub implements StubConstants {
 		InputStreamResponseListener listener = new InputStreamResponseListener();
 
 		client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_SERVICE)
-				.method(HttpMethod.POST).accept(getAcceptedTypes())
+				.method(HttpMethod.POST)
+				.accept(getAcceptedTypes(new SerializationFormat[] { SerializationFormat.defaultFotmat() }))
 				.header("content-type", SerializationFormat.defaultFotmat().httpFormat())
 				.content(new BytesContentProvider(serializer.serialize(service, ServiceInfo.class))).send(listener);
 
@@ -175,6 +179,30 @@ public class ClientStub extends Stub implements StubConstants {
 			Serializer serializer) throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported,
 					RPCException, RPCProviderFailureException, IOException, Exception {
 
+		return this.call(service, info, args, serializer, null);
+
+	}
+
+	/**
+	 * calls execute service of given service provider
+	 * 
+	 * @param service
+	 * @param info
+	 * @param args
+	 * @param serializer
+	 * @return
+	 * @throws ResponseContentTypeCannotBePrasedException
+	 * @throws SerializationFormatNotSupported
+	 * @throws RPCException
+	 * @throws RPCProviderFailureException
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> ServiceResponse<T> call(ServiceDescription<T> service, ServiceProviderInfo info, Object[] args,
+			Serializer serializer, SerializationFormat[] accept) throws ResponseContentTypeCannotBePrasedException,
+					SerializationFormatNotSupported, RPCException, RPCProviderFailureException, IOException, Exception {
+
 		ServiceRequest request = ServiceRequest.create(service.getInfo(), genRandomId(), args);
 
 		HttpClient client = new HttpClient();
@@ -189,7 +217,7 @@ public class ClientStub extends Stub implements StubConstants {
 			InputStreamResponseListener listener = new InputStreamResponseListener();
 
 			client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_EXECUTE)
-					.method(HttpMethod.POST).accept(getAcceptedTypes())
+					.method(HttpMethod.POST).accept(getAcceptedTypes(accept))
 					.header("content-type", SerializationFormat.defaultFotmat().httpFormat()).content(content)
 					.send(listener);
 
