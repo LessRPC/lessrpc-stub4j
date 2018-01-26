@@ -26,6 +26,7 @@ import org.lessrpc.common.info.ServiceSupportInfo;
 import org.lessrpc.common.info.responses.ServiceResponse;
 import org.lessrpc.common.serializer.Serializer;
 import org.lessrpc.common.services.ServiceProvider;
+import org.lessrpc.serialize.msgpack.MsgPackSerializer;
 
 public class SimpleStubsRunningTest {
 	/**
@@ -57,6 +58,7 @@ public class SimpleStubsRunningTest {
 
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
+		list.add(new MsgPackSerializer());
 
 		serverStub = new ServerStub(serverPort, list);
 
@@ -145,6 +147,21 @@ public class SimpleStubsRunningTest {
 	@Test
 	public void testExecute() throws Exception {
 		ServiceResponse<Integer> response = clientStub.call(desc, spInfo, new Integer[] { 4, 5 }, new JsonSerializer());
+
+		// checking service information
+		assertEquals(service, response.getService());
+		//
+		// checking class of result
+		assertEquals(Integer.class, response.getContent().getClass());
+
+		// value of results to be equal
+		assertEquals(new Integer(9), response.getContent());
+	}
+
+	@Test
+	public void testExecuteSpecifyFormat() throws Exception {
+		ServiceResponse<Integer> response = clientStub.call(desc, spInfo, new Integer[] { 4, 5 }, new MsgPackSerializer(),
+				new SerializationFormat[] { new MsgPackSerializer().getType() });
 
 		// checking service information
 		assertEquals(service, response.getService());
