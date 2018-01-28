@@ -218,7 +218,7 @@ public class ClientStub extends Stub implements StubConstants {
 
 			client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_EXECUTE)
 					.method(HttpMethod.POST).accept(getAcceptedTypes(accept))
-					.header("content-type", SerializationFormat.defaultFotmat().httpFormat()).content(content)
+					.header("content-type", serializer.getType().httpFormat()).content(content)
 					.send(listener);
 
 			serializer.serialize(request, ServiceRequest.class, output);
