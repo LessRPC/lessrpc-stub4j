@@ -56,12 +56,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-
+		System.out.println("[Reuqest Received  " + target + " ");
 		if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_PING)
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_SERVICE)
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_INFO)
 				|| target.trim().toLowerCase().equals(LESS_RPC_REQUEST_EXECUTE)) {
-		try {
+			try {
 				handleLessRPC(target, baseRequest, request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -143,7 +143,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		}
 
 		response.setContentType(responseSerializer.getType().httpFormat());
-		
+
 		// -------- start handling response
 		if (target.trim().toLowerCase().equals(LESS_RPC_REQUEST_PING)) {
 			handlePing(target, baseRequest, request, response, responseSerializer, requestSerializer);
@@ -259,10 +259,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			return;
 		}
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-			String str = reader.readLine();
-			ByteArrayInputStream in = new ByteArrayInputStream(str.getBytes());
-			serviceRequest = requestSerializer.deserialize(in, ServiceRequest.class, locator);
+			serviceRequest = requestSerializer.deserialize(is, ServiceRequest.class, locator);
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
@@ -369,7 +366,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			SerializationFormat format) throws Exception {
 		// setting status of http
 		response.setStatus(status.httpMatchingStatus());
-		
+
 		response.setContentType(format.httpFormat());
 
 		// sending output
