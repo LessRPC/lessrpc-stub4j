@@ -58,7 +58,6 @@ public class SimpleStubsRunningTest {
 
 		List<Serializer> list = new ArrayList<Serializer>();
 		list.add(new JsonSerializer());
-		list.add(new MsgPackSerializer());
 
 		serverStub = new ServerStub(serverPort, list);
 
@@ -160,8 +159,8 @@ public class SimpleStubsRunningTest {
 
 	@Test
 	public void testExecuteSpecifyFormat() throws Exception {
-		ServiceResponse<Integer> response = clientStub.call(desc, spInfo, new Integer[] { 4, 5 }, new MsgPackSerializer(),
-				new SerializationFormat[] { new MsgPackSerializer().getType() });
+		ServiceResponse<Integer> response = clientStub.call(desc, spInfo, new Integer[] { 4, 5 }, new JsonSerializer(),
+				new SerializationFormat[] { new JsonSerializer().getType() });
 
 		// checking service information
 		assertEquals(service, response.getService());

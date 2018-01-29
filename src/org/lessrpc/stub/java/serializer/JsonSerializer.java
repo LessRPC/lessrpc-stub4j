@@ -116,7 +116,7 @@ public class JsonSerializer extends Serializer {
 
 		JsonToken token = null;
 		String fieldName = null;
-		while ((token = parser.nextToken()) != null) {
+		while ((token = parser.nextToken()) != null && token != JsonToken.END_OBJECT) {
 			if (token == JsonToken.FIELD_NAME) {
 				fieldName = parser.getValueAsString();
 			} else if (fieldName != null) {
@@ -166,7 +166,7 @@ public class JsonSerializer extends Serializer {
 
 		JsonToken token = null;
 		String fieldName = null;
-		while ((token = parser.nextToken()) != null) {
+		while ((token = parser.nextToken()) != null && token != JsonToken.END_OBJECT) {
 			if (token == JsonToken.FIELD_NAME) {
 				fieldName = parser.getValueAsString();
 			} else if (fieldName != null) {

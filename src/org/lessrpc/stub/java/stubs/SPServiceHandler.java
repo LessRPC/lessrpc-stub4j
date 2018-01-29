@@ -76,8 +76,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 				return;
 			}
 		} else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			baseRequest.setHandled(true);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 
 	}
@@ -85,10 +85,9 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	private void handlePing(String target, Request baseRequest, HttpServletRequest request,
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws UnderterminableCodeException, Exception {
+		baseRequest.setHandled(true);
 		response.getOutputStream().write(responseSerializer.serialize(
 				new IntegerResponse(StatusType.OK.toCode(), provider.ping() ? 1 : 0), IntegerResponse.class));
-		baseRequest.setHandled(true);
-
 		return;
 	}
 
@@ -233,9 +232,9 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	private void handleInfo(String target, Request baseRequest, HttpServletRequest request,
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws Exception {
+		baseRequest.setHandled(true);
 		response.getOutputStream().write(responseSerializer.serialize(
 				new ProviderInfoResponse(StatusType.OK.toCode(), provider.info()), ProviderInfoResponse.class));
-		baseRequest.setHandled(true);
 
 		return;
 
@@ -276,11 +275,10 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			// setting status of http
 			response.setStatus(StatusType.APPLICATION_SPECIFIC_ERROR.httpMatchingStatus());
 
-			// sending output
-			response.getOutputStream().write(responseSerializer
-					.serialize(new TextResponse(e.getErrorCode(), e.getContent()), TextResponse.class));
 			// setting request as handled
 			baseRequest.setHandled(true);
+			response.getOutputStream().write(responseSerializer
+					.serialize(new TextResponse(e.getErrorCode(), e.getContent()), TextResponse.class));
 		} catch (ExecuteInternalError e) {
 			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
@@ -299,11 +297,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 		// writing service response
 		response.setContentType(responseSerializer.getType().httpFormat());
+		// setting as handled
+		baseRequest.setHandled(true);
 		// serializing response
 		responseSerializer.serialize(new ExecuteRequestResponse<>(StatusType.OK.toCode(), serviceResponse),
 				ExecuteRequestResponse.class, response.getOutputStream());
-		// setting as handled
-		baseRequest.setHandled(true);
 
 		return;
 
