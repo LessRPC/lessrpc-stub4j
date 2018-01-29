@@ -1,9 +1,11 @@
 
 package org.lessrpc.stub.java.stubs;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.servlet.ServletException;
@@ -11,6 +13,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.lessrpc.stub.java.StubConstants;
@@ -86,8 +90,9 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws UnderterminableCodeException, Exception {
 		baseRequest.setHandled(true);
-		response.getOutputStream().write(responseSerializer.serialize(
-				new IntegerResponse(StatusType.OK.toCode(), provider.ping() ? 1 : 0), IntegerResponse.class));
+
+		responseSerializer.serialize(new IntegerResponse(StatusType.OK.toCode(), provider.ping() ? 1 : 0),
+				IntegerResponse.class, new Base64OutputStream(response.getOutputStream(), true));
 		return;
 	}
 
@@ -233,8 +238,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws Exception {
 		baseRequest.setHandled(true);
-		response.getOutputStream().write(responseSerializer.serialize(
-				new ProviderInfoResponse(StatusType.OK.toCode(), provider.info()), ProviderInfoResponse.class));
+		responseSerializer.serialize(new ProviderInfoResponse(StatusType.OK.toCode(), provider.info()),
+				ProviderInfoResponse.class, new Base64OutputStream(response.getOutputStream(), true));
 
 		return;
 
@@ -247,18 +252,22 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		// input to read
 		ServiceRequest serviceRequest = null;
 
-		ServletInputStream is = null;
+		InputStream is = null;
 
 		// checking if there is a content to POST request
 		try {
 			is = request.getInputStream();
+			// is = new Base64InputStream(request.getInputStream(),false);
+			// InputStreamReader bis = new InputStreamReader(is);
+			// bis.read
 		} catch (Exception e) {
 			sendStatus(StatusType.POST_CONTENT_NOT_AVAILABLE, baseRequest, response,
 					SerializationFormat.defaultFotmat());
 			return;
 		}
 		try {
-			serviceRequest = requestSerializer.deserialize(is, ServiceRequest.class, locator);
+			serviceRequest = requestSerializer.deserialize(new Base64InputStream(is, false), ServiceRequest.class,
+					locator);
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
@@ -277,8 +286,9 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 			// setting request as handled
 			baseRequest.setHandled(true);
-			response.getOutputStream().write(responseSerializer
-					.serialize(new TextResponse(e.getErrorCode(), e.getContent()), TextResponse.class));
+			responseSerializer.serialize(new TextResponse(e.getErrorCode(), e.getContent()), TextResponse.class,
+					new Base64OutputStream(response.getOutputStream(), true));
+
 		} catch (ExecuteInternalError e) {
 			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
@@ -301,7 +311,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		baseRequest.setHandled(true);
 		// serializing response
 		responseSerializer.serialize(new ExecuteRequestResponse<>(StatusType.OK.toCode(), serviceResponse),
-				ExecuteRequestResponse.class, response.getOutputStream());
+				ExecuteRequestResponse.class, new Base64OutputStream(response.getOutputStream(), true));
 
 		return;
 
@@ -313,11 +323,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		// input to read
 		ServiceInfo<?> info = null;
 
-		ServletInputStream is = null;
+		Base64InputStream is = null;
 
 		// checking if there is a content to POST request
 		try {
-			is = request.getInputStream();
+			is = new Base64InputStream(request.getInputStream(), false);
 		} catch (Exception e) {
 			sendStatus(StatusType.POST_CONTENT_NOT_AVAILABLE, baseRequest, response, responseSerializer.getType());
 			return;
@@ -344,7 +354,7 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		}
 
 		responseSerializer.serialize(new ServiceSupportResponse(StatusType.OK.toCode(), service),
-				ServiceSupportResponse.class, response.getOutputStream());
+				ServiceSupportResponse.class, new Base64OutputStream(response.getOutputStream(), true));
 
 		baseRequest.setHandled(true);
 
@@ -370,8 +380,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		// sending output
 		Serializer serializer = stub.getSerializer(format);
 
-		response.getOutputStream()
-				.write(serializer.serialize(new TextResponse(status.toCode(), statusContent), TextResponse.class));
+		serializer.serialize(new TextResponse(status.toCode(), statusContent), TextResponse.class,
+				new Base64OutputStream(response.getOutputStream(), true));
 
 		// setting request as handled
 		baseRequest.setHandled(true);

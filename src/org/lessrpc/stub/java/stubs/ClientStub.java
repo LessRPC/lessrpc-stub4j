@@ -1,13 +1,17 @@
 package org.lessrpc.stub.java.stubs;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.BytesContentProvider;
@@ -149,7 +153,7 @@ public class ClientStub extends Stub implements StubConstants {
 				.method(HttpMethod.POST)
 				.accept(getAcceptedTypes(new SerializationFormat[] { SerializationFormat.defaultFotmat() }))
 				.header("content-type", SerializationFormat.defaultFotmat().httpFormat())
-				.content(new BytesContentProvider(serializer.serialize(service, ServiceInfo.class))).send(listener);
+				.content(new BytesContentProvider( Base64.getEncoder().encode(serializer.serialize(service, ServiceInfo.class)))).send(listener);
 
 		ServiceSupportResponse supportResponse = readResponse(listener, ServiceSupportResponse.class, null,
 				HTTP_WAIT_TIME_SHORT);
@@ -174,7 +178,6 @@ public class ClientStub extends Stub implements StubConstants {
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> ServiceResponse<T> call(ServiceDescription<T> service, ServiceProviderInfo info, Object[] args,
 			Serializer serializer) throws ResponseContentTypeCannotBePrasedException, SerializationFormatNotSupported,
 					RPCException, RPCProviderFailureException, IOException, Exception {
@@ -221,9 +224,10 @@ public class ClientStub extends Stub implements StubConstants {
 					.header("content-type", serializer.getType().httpFormat()).content(content)
 					.send(listener);
 
-			serializer.serialize(request, ServiceRequest.class, output);
-			output.flush();
-			output.close();
+			Base64OutputStream bs64 = new Base64OutputStream(output);
+			serializer.serialize(request, ServiceRequest.class, bs64);
+			bs64.flush();
+			bs64.close();
 
 			execResponse = readResponse(listener, ExecuteRequestResponse.class, service, HTTP_WAIT_TIME_LONG);
 		}
@@ -298,9 +302,9 @@ public class ClientStub extends Stub implements StubConstants {
 			// Scanner(responseContent).useDelimiter("\\Z").next().getBytes();
 			// System.out.println(new String(bytes));
 			if (desc != null)
-				return serializer.deserialize(responseContent, cls, ServiceLocator.create(desc));
+				return serializer.deserialize(new Base64InputStream(responseContent,false), cls, ServiceLocator.create(desc));
 			else
-				return serializer.deserialize(responseContent, cls);
+				return serializer.deserialize(new Base64InputStream(responseContent,false), cls);
 
 		}
 
@@ -319,7 +323,7 @@ public class ClientStub extends Stub implements StubConstants {
 		// Use try-with-resources to close input stream.
 		try {
 			try (InputStream responseContent = listener.getInputStream()) {
-				return serializer.deserialize(responseContent, TextResponse.class);
+				return serializer.deserialize(new Base64InputStream(responseContent), TextResponse.class);
 			}
 		} catch (Exception e) {
 			throw new RPCProviderFailureException();
