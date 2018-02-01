@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -91,8 +92,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 					throws UnderterminableCodeException, Exception {
 		baseRequest.setHandled(true);
 
+		OutputStream output = response.getOutputStream();
+		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+			output = new Base64OutputStream(output, true);
+		}
 		responseSerializer.serialize(new IntegerResponse(StatusType.OK.toCode(), provider.ping() ? 1 : 0),
-				IntegerResponse.class, new Base64OutputStream(response.getOutputStream(), true));
+				IntegerResponse.class, output);
 		return;
 	}
 
@@ -238,8 +243,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws Exception {
 		baseRequest.setHandled(true);
+		OutputStream output = response.getOutputStream();
+		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+			output = new Base64OutputStream(output, true);
+		}
 		responseSerializer.serialize(new ProviderInfoResponse(StatusType.OK.toCode(), provider.info()),
-				ProviderInfoResponse.class, new Base64OutputStream(response.getOutputStream(), true));
+				ProviderInfoResponse.class, output);
 
 		return;
 
@@ -266,8 +275,11 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			return;
 		}
 		try {
-			serviceRequest = requestSerializer.deserialize(new Base64InputStream(is, false), ServiceRequest.class,
-					locator);
+			InputStream in = is;
+			if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+				in = new Base64InputStream(is, false);
+			}
+			serviceRequest = requestSerializer.deserialize(in, ServiceRequest.class, locator);
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
@@ -286,8 +298,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 
 			// setting request as handled
 			baseRequest.setHandled(true);
+			OutputStream output = response.getOutputStream();
+			if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+				output = new Base64OutputStream(output, true);
+			}
 			responseSerializer.serialize(new TextResponse(e.getErrorCode(), e.getContent()), TextResponse.class,
-					new Base64OutputStream(response.getOutputStream(), true));
+					output);
 
 		} catch (ExecuteInternalError e) {
 			sendStatus(StatusType.INTERNAL_ERROR, baseRequest, response, responseSerializer.getType());
@@ -309,9 +325,13 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		response.setContentType(responseSerializer.getType().httpFormat());
 		// setting as handled
 		baseRequest.setHandled(true);
+		OutputStream output = response.getOutputStream();
+		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+			output = new Base64OutputStream(output, true);
+		}
 		// serializing response
 		responseSerializer.serialize(new ExecuteRequestResponse<>(StatusType.OK.toCode(), serviceResponse),
-				ExecuteRequestResponse.class, new Base64OutputStream(response.getOutputStream(), true));
+				ExecuteRequestResponse.class, output);
 
 		return;
 
@@ -323,18 +343,23 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		// input to read
 		ServiceInfo<?> info = null;
 
-		Base64InputStream is = null;
+		InputStream is = null;
 
 		// checking if there is a content to POST request
 		try {
-			is = new Base64InputStream(request.getInputStream(), false);
+
+			is = request.getInputStream();
 		} catch (Exception e) {
 			sendStatus(StatusType.POST_CONTENT_NOT_AVAILABLE, baseRequest, response, responseSerializer.getType());
 			return;
 		}
 
 		try {
-			info = requestSerializer.deserialize(is, ServiceInfo.class);
+			InputStream in = is;
+			if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+				in = new Base64InputStream(is, false);
+			}
+			info = requestSerializer.deserialize(in, ServiceInfo.class);
 		} catch (Exception e) {
 			sendStatus(StatusType.PARSE_ERROR, baseRequest, response, responseSerializer.getType());
 			return;
@@ -353,8 +378,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 			return;
 		}
 
+		OutputStream output = response.getOutputStream();
+		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+			output = new Base64OutputStream(output, true);
+		}
 		responseSerializer.serialize(new ServiceSupportResponse(StatusType.OK.toCode(), service),
-				ServiceSupportResponse.class, new Base64OutputStream(response.getOutputStream(), true));
+				ServiceSupportResponse.class, output);
 
 		baseRequest.setHandled(true);
 
@@ -380,8 +409,12 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		// sending output
 		Serializer serializer = stub.getSerializer(format);
 
-		serializer.serialize(new TextResponse(status.toCode(), statusContent), TextResponse.class,
-				new Base64OutputStream(response.getOutputStream(), true));
+		OutputStream output = response.getOutputStream();
+		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+			output = new Base64OutputStream(output, true);
+		}
+
+		serializer.serialize(new TextResponse(status.toCode(), statusContent), TextResponse.class, output);
 
 		// setting request as handled
 		baseRequest.setHandled(true);

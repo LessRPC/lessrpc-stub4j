@@ -1,6 +1,5 @@
 package org.lessrpc.stub.java.stubs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -149,11 +148,16 @@ public class ClientStub extends Stub implements StubConstants {
 
 		InputStreamResponseListener listener = new InputStreamResponseListener();
 
+		byte[] out = serializer.serialize(service, ServiceInfo.class);
+		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+			out = Base64.getEncoder().encode(out);
+		}
+
 		client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_SERVICE)
 				.method(HttpMethod.POST)
 				.accept(getAcceptedTypes(new SerializationFormat[] { SerializationFormat.defaultFotmat() }))
 				.header("content-type", SerializationFormat.defaultFotmat().httpFormat())
-				.content(new BytesContentProvider( Base64.getEncoder().encode(serializer.serialize(service, ServiceInfo.class)))).send(listener);
+				.content(new BytesContentProvider(out)).send(listener);
 
 		ServiceSupportResponse supportResponse = readResponse(listener, ServiceSupportResponse.class, null,
 				HTTP_WAIT_TIME_SHORT);
@@ -215,19 +219,19 @@ public class ClientStub extends Stub implements StubConstants {
 
 		OutputStreamContentProvider content = new OutputStreamContentProvider();
 
+		OutputStream out = null;
 		try (OutputStream output = content.getOutputStream()) {
-
+			out = output;
 			InputStreamResponseListener listener = new InputStreamResponseListener();
 
 			client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_EXECUTE)
 					.method(HttpMethod.POST).accept(getAcceptedTypes(accept))
-					.header("content-type", serializer.getType().httpFormat()).content(content)
-					.send(listener);
-
-			Base64OutputStream bs64 = new Base64OutputStream(output);
-			serializer.serialize(request, ServiceRequest.class, bs64);
-			bs64.flush();
-			bs64.close();
+					.header("content-type", serializer.getType().httpFormat()).content(content).send(listener);
+			if (org.lessrpc.stub.java.io.Base64.DO_BASE64)
+				out = new Base64OutputStream(output);
+			serializer.serialize(request, ServiceRequest.class, out);
+			out.flush();
+			out.close();
 
 			execResponse = readResponse(listener, ExecuteRequestResponse.class, service, HTTP_WAIT_TIME_LONG);
 		}
@@ -298,13 +302,17 @@ public class ClientStub extends Stub implements StubConstants {
 		// status is OK so read response
 		// Use try-with-resources to close input stream.
 		try (InputStream responseContent = listener.getInputStream()) {
-			// byte[] bytes = new
-			// Scanner(responseContent).useDelimiter("\\Z").next().getBytes();
-			// System.out.println(new String(bytes));
-			if (desc != null)
-				return serializer.deserialize(new Base64InputStream(responseContent,false), cls, ServiceLocator.create(desc));
-			else
-				return serializer.deserialize(new Base64InputStream(responseContent,false), cls);
+
+			InputStream in = responseContent;
+			if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+				in = new Base64InputStream(responseContent, false);
+			}
+
+			if (desc != null) {
+				return serializer.deserialize(in, cls, ServiceLocator.create(desc));
+			} else {
+				return serializer.deserialize(in, cls);
+			}
 
 		}
 
@@ -323,7 +331,11 @@ public class ClientStub extends Stub implements StubConstants {
 		// Use try-with-resources to close input stream.
 		try {
 			try (InputStream responseContent = listener.getInputStream()) {
-				return serializer.deserialize(new Base64InputStream(responseContent), TextResponse.class);
+				InputStream in = responseContent;
+				if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+					in = new Base64InputStream(responseContent, false);
+				}
+				return serializer.deserialize(in, TextResponse.class);
 			}
 		} catch (Exception e) {
 			throw new RPCProviderFailureException();
