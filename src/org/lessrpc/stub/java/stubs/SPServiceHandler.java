@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.eclipse.jetty.io.WriterOutputStream;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.lessrpc.stub.java.StubConstants;
@@ -242,13 +243,10 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 	private void handleInfo(String target, Request baseRequest, HttpServletRequest request,
 			HttpServletResponse response, Serializer responseSerializer, Serializer requestSerializer)
 					throws Exception {
+		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
-		OutputStream output = response.getOutputStream();
-		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
-			output = new Base64OutputStream(output, true);
-		}
 		responseSerializer.serialize(new ProviderInfoResponse(StatusType.OK.toCode(), provider.info()),
-				ProviderInfoResponse.class, output);
+				ProviderInfoResponse.class, new WriterOutputStream(response.getWriter()));
 
 		return;
 
@@ -295,13 +293,14 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		} catch (ApplicationSpecificErrorException e) {
 			// setting status of http
 			response.setStatus(StatusType.APPLICATION_SPECIFIC_ERROR.httpMatchingStatus());
-
+			response.setStatus(HttpServletResponse.SC_OK);
 			// setting request as handled
 			baseRequest.setHandled(true);
-			OutputStream output = response.getOutputStream();
-			if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
-				output = new Base64OutputStream(output, true);
-			}
+//			OutputStream output = response.getOutputStream();
+//			if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
+//				output = new Base64OutputStream(output, true);
+//			}
+			OutputStream output = new WriterOutputStream(response.getWriter());
 			responseSerializer.serialize(new TextResponse(e.getErrorCode(), e.getContent()), TextResponse.class,
 					output);
 
@@ -325,7 +324,8 @@ public class SPServiceHandler extends AbstractHandler implements StubConstants {
 		response.setContentType(responseSerializer.getType().httpFormat());
 		// setting as handled
 		baseRequest.setHandled(true);
-		OutputStream output = response.getOutputStream();
+		response.setStatus(HttpServletResponse.SC_OK);
+		OutputStream output = new WriterOutputStream(response.getWriter());
 		if (org.lessrpc.stub.java.io.Base64.DO_BASE64) {
 			output = new Base64OutputStream(output, true);
 		}
