@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.BytesContentProvider;
@@ -227,9 +226,6 @@ public class ClientStub extends Stub implements StubConstants {
 			client.newRequest(HTTP_PROTOCOL + info.getURL() + ":" + info.getPort() + LESS_RPC_REQUEST_EXECUTE)
 					.method(HttpMethod.POST).accept(getAcceptedTypes(accept))
 					.header("content-type", serializer.getType().httpFormat()).content(content).send(listener);
-			if (org.lessrpc.stub.java.io.Base64.DO_BASE64)
-				out = new Base64OutputStream(output);
-			serializer.serialize(request, ServiceRequest.class, out);
 			out.flush();
 			out.close();
 
